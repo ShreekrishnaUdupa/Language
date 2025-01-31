@@ -9,6 +9,7 @@ using std::string;
 
 class Lexer {
 private:
+    vector<string> program;
 
     vector<string> split (string s)
     {
@@ -157,6 +158,14 @@ private:
 
         return program;
     }
+
+public:
+
+    Lexer (string s)
+    {
+        program = split(s);
+    }
+
 };
 
 #endif
