@@ -34,15 +34,15 @@ struct Token {
 class Lexer {
 private:
 
-    vector<string> split (string s)
-    {
+    vector<string> split (string s) {
+
         vector<string> program;
         string temp = "";
         short int doubleQuotes = 0;
         bool quotesActivated = false;
 
-        for ( int i = 0; i < s.size(); ++i )
-        {
+        for ( int i = 0; i < s.size(); ++i ) {
+            
             if (s[i] == '"')
             {
                 if (doubleQuotes == 0)
@@ -190,10 +190,10 @@ private:
         return program;
     }
 
-    void validateTokens (vector<Token> tokens)
-    {
-        for (const auto& value: tokens)
-        {
+    void validateTokens (vector<Token> tokens) {
+
+        for (const auto& value: tokens) {
+
             if (value.type == literal && value.value[0] >= '0' && value.value[0] <= '9')
             {
                 for (const auto& num: value.value)
@@ -208,12 +208,12 @@ private:
         }
     }
 
-    vector<Token> addTokens (vector<string> program)
-    {
+    vector<Token> addTokens (vector<string> program) {
+
         vector<Token> tokens;
 
-        for (const string& value: program)
-        {
+        for (const string& value: program) {
+            
             if (value == ".") tokens.push_back({dot, "."});
 
             else if (value == ";") tokens.push_back({semicolon, ";"});
