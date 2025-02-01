@@ -200,7 +200,7 @@ private:
                 {
                     if(!(num >= '0' && num <= '9'))
                     {
-                        cerr << "TokenError: Illegal Literal.";
+                        cerr << "\033[31mTokenError: Illegal Literal.\033[0m";
                         exit(1);
                     }
                 }
