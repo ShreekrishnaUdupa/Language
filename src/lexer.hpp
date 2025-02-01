@@ -1,25 +1,27 @@
 #ifndef LEXER_HPP
 #define LEXER_HPP
 
+#include <iostream>
 #include <vector>
 #include <string>
 
+using std::cin, std::cout, std::cerr;
 using std::vector;
 using std::string;
 
 enum TokenType {
-    KEYWORD,
-    IDENTIFIER,
-    OPERATOR,
-    LITERAL,
-    DOT,
-    OPEN_BRACE,
-    CLOSE_BRACE,
-    OPEN_PAREN,
-    CLOSE_PAREN,
-    SEMICOLON,
-    ASSIGNMENT,
-    UNKNOWN
+    keyword,
+    identifier,
+    op,
+    literal,
+    dot,
+    open_brace,
+    close_brace,
+    open_paren,
+    close_paren,
+    semicolon,
+    assignment,
+    unknown
 };
 
 using enum TokenType;
@@ -31,9 +33,6 @@ struct Token {
 
 class Lexer {
 private:
-
-    vector<string> program;
-    vector<Token> tokens;
 
     vector<string> split (string s)
     {
@@ -170,7 +169,7 @@ private:
                     continue;           
             }
 
-            if ( (s[i] >= 'a' && s[i] <= 'z') || (s[i] >= 'A' && s[i] <= 'Z') || (s[i] >= '0' && s[i] <= '9'))
+            if ( (s[i] >= 'a' && s[i] <= 'z') || (s[i] >= 'A' && s[i] <= 'Z') || (s[i] >= '0' && s[i] <= '9') || s[i] == '_' )
             {
                 temp += s[i];
                 continue;
@@ -191,42 +190,70 @@ private:
         return program;
     }
 
+    void validateTokens (vector<Token> tokens)
+    {
+        for (const auto& value: tokens)
+        {
+            if (value.type == literal && value.value[0] >= '0' && value.value[0] <= '9')
+            {
+                for (const auto& num: value.value)
+                {
+                    if(!(num >= '0' && num <= '9'))
+                    {
+                        cerr << "TokenError: Illegal Literal.";
+                        exit(1);
+                    }
+                }
+            }
+        }
+    }
+
     vector<Token> addTokens (vector<string> program)
     {
         vector<Token> tokens;
 
         for (const string& value: program)
         {
-            if (value == ".") tokens.push_back({DOT, "."});
+            if (value == ".") tokens.push_back({dot, "."});
 
-            else if (value == ";") tokens.push_back({SEMICOLON, ";"});
-            else if (value == "{") tokens.push_back({OPEN_BRACE, "{"});
-            else if (value == "}") tokens.push_back({CLOSE_BRACE, "}"});
-            else if (value == "(") tokens.push_back({OPEN_PAREN, "("});
-            else if (value == ")") tokens.push_back({CLOSE_PAREN, ")"});
-            else if (value == "=") tokens.push_back({ASSIGNMENT, "="});
+            else if (value == ";") tokens.push_back({semicolon, ";"});
+            else if (value == "{") tokens.push_back({open_brace, "{"});
+            else if (value == "}") tokens.push_back({close_brace, "}"});
+            else if (value == "(") tokens.push_back({open_paren, "("});
+            else if (value == ")") tokens.push_back({close_paren, ")"});
+            else if (value == "=") tokens.push_back({assignment, "="});
 
             // Operators
 
-            else if (value == "+") tokens.push_back({OPERATOR, "+"});
-            else if (value == "-") tokens.push_back({OPERATOR, "-"});
-            else if (value == "*") tokens.push_back({OPERATOR, "*"});
-            else if (value == "/") tokens.push_back({OPERATOR, "/"});
-            else if (value == "%") tokens.push_back({OPERATOR, "%"});
+            else if (value == "+") tokens.push_back({op, "+"});
+            else if (value == "-") tokens.push_back({op, "-"});
+            else if (value == "*") tokens.push_back({op, "*"});
+            else if (value == "/") tokens.push_back({op, "/"});
+            else if (value == "%") tokens.push_back({op, "%"});
 
+            else if (value == "true" || value == "false")
+                tokens.push_back({literal, value});
 
-            else if (value[0] == '"') tokens.push_back({LITERAL, value});
+            else if (value == "class" || value == "void" || value == "main" || value == "Int" || value == "Bool")
+                tokens.push_back({keyword, value});
 
-            else if (value == "class" || value == "main" || value == "Int" || value == "main")
-                tokens.push_back({KEYWORD, value});
+            else if ( (value[0] >= 'a' && value[0] <= 'z') || (value[0] >= 'A' && value[0] <= 'Z') || value[0] == '_' )
+                tokens.push_back({identifier, value});
 
-            else tokens.push_back({IDENTIFIER, value});
+            else if (value[0] >= '0' && value[0] <= '9')
+                tokens.push_back({literal, value});
+
+            else if (value[0] == '"')
+                tokens.push_back({literal, value});
         }
 
+        validateTokens(tokens);
         return tokens;
     }
 
 public:
+    vector<string> program;
+    vector<Token> tokens;
 
     Lexer (string s)
     {
