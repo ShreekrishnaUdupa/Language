@@ -37,7 +37,7 @@ private:
     vector<string> split (const string& s) {
 
         vector<string> program;
-        string temp = "";
+        string temp;
         short int doubleQuotes = 0;
         bool quotesActivated = false;
 
@@ -56,7 +56,7 @@ private:
                 {
                     temp += '"';
                     program.push_back(temp);
-                    temp = "";
+                    temp.clear();
                     doubleQuotes = 0;
                     quotesActivated = false;
                 }
@@ -77,7 +77,7 @@ private:
                         program.push_back(temp);
 
                     program.push_back(".");
-                    temp = "";
+                    temp.clear();
                     continue;
 
                 case ';':
@@ -85,7 +85,7 @@ private:
                         program.push_back(temp);
 
                     program.push_back(";");
-                    temp = "";
+                    temp.clear();
                     continue;
 
                 case '{':
@@ -93,7 +93,7 @@ private:
                         program.push_back(temp);
 
                     program.push_back("{");
-                    temp = "";
+                    temp.clear();
                     continue;
 
                 case '}':
@@ -101,7 +101,7 @@ private:
                         program.push_back(temp);
 
                     program.push_back("}");
-                    temp = "";
+                    temp.clear();
                     continue;
 
                 case '(':
@@ -109,7 +109,7 @@ private:
                         program.push_back(temp);
 
                     program.push_back("(");
-                    temp = "";
+                    temp.clear();
                     continue;
 
                 case ')':
@@ -117,7 +117,7 @@ private:
                         program.push_back(temp);
 
                     program.push_back(")");
-                    temp = "";
+                    temp.clear();
                     continue;
 
                 case '=':
@@ -125,7 +125,7 @@ private:
                         program.push_back(temp);
 
                     program.push_back("=");
-                    temp = "";
+                    temp.clear();
                     continue;
 
                 case '+':
@@ -133,7 +133,7 @@ private:
                         program.push_back(temp);
 
                     program.push_back("+");
-                    temp = "";
+                    temp.clear();
                     continue;
 
                 case '-':
@@ -141,7 +141,7 @@ private:
                         program.push_back(temp);
 
                     program.push_back("-");
-                    temp = "";
+                    temp.clear();
                     continue;
 
                 case '*':
@@ -149,7 +149,7 @@ private:
                         program.push_back(temp);
 
                     program.push_back("*");
-                    temp = "";
+                    temp.clear();
                     continue;
 
                 case '/':
@@ -157,7 +157,7 @@ private:
                         program.push_back(temp);
 
                     program.push_back("/");
-                    temp = "";
+                    temp.clear();
                     continue;
 
                 case '%':
@@ -165,7 +165,7 @@ private:
                         program.push_back(temp);
 
                     program.push_back("%");
-                    temp = "";
+                    temp.clear();
                     continue;           
             }
 
@@ -180,7 +180,7 @@ private:
                 if (temp != "")
                 {
                     program.push_back(temp);
-                    temp = "";
+                    temp.clear();
                 }
 
                 continue;
