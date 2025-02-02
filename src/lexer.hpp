@@ -78,7 +78,7 @@ private:
 
                     program.push_back(".");
                     temp.clear();
-                    continue;
+                    break;
 
                 case ';':
                     if (temp != "")
@@ -86,7 +86,7 @@ private:
 
                     program.push_back(";");
                     temp.clear();
-                    continue;
+                    break;
 
                 case '{':
                     if (temp != "")
@@ -94,7 +94,7 @@ private:
 
                     program.push_back("{");
                     temp.clear();
-                    continue;
+                    break;
 
                 case '}':
                     if (temp != "")
@@ -102,7 +102,7 @@ private:
 
                     program.push_back("}");
                     temp.clear();
-                    continue;
+                    break;
 
                 case '(':
                     if (temp != "")
@@ -110,7 +110,7 @@ private:
 
                     program.push_back("(");
                     temp.clear();
-                    continue;
+                    break;
 
                 case ')':
                     if (temp != "")
@@ -118,7 +118,7 @@ private:
 
                     program.push_back(")");
                     temp.clear();
-                    continue;
+                    break;
 
                 case '=':
                     if (temp != "")
@@ -126,7 +126,7 @@ private:
 
                     program.push_back("=");
                     temp.clear();
-                    continue;
+                    break;
 
                 case '+':
                     if (temp != "")
@@ -134,7 +134,7 @@ private:
 
                     program.push_back("+");
                     temp.clear();
-                    continue;
+                    break;
 
                 case '-':
                     if (temp != "")
@@ -142,7 +142,7 @@ private:
 
                     program.push_back("-");
                     temp.clear();
-                    continue;
+                    break;
 
                 case '*':
                     if (temp != "")
@@ -150,7 +150,7 @@ private:
 
                     program.push_back("*");
                     temp.clear();
-                    continue;
+                    break;
 
                 case '/':
                     if (temp != "")
@@ -158,7 +158,7 @@ private:
 
                     program.push_back("/");
                     temp.clear();
-                    continue;
+                    break;
 
                 case '%':
                     if (temp != "")
@@ -166,7 +166,7 @@ private:
 
                     program.push_back("%");
                     temp.clear();
-                    continue;           
+                    break;           
             }
 
             if ( (s[i] >= 'a' && s[i] <= 'z') || (s[i] >= 'A' && s[i] <= 'Z') || (s[i] >= '0' && s[i] <= '9') || s[i] == '_' )
