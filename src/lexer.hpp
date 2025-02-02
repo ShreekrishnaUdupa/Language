@@ -34,7 +34,7 @@ struct Token {
 class Lexer {
 private:
 
-    vector<string> split (string s) {
+    vector<string> split (const string& s) {
 
         vector<string> program;
         string temp = "";
@@ -190,7 +190,7 @@ private:
         return program;
     }
 
-    void validateTokens (vector<Token> tokens) {
+    void validateTokens (const vector<Token>& tokens) {
 
         for (const auto& value: tokens) {
 
@@ -208,7 +208,7 @@ private:
         }
     }
 
-    vector<Token> addTokens (vector<string> program) {
+    vector<Token> addTokens (const vector<string>& program) {
 
         vector<Token> tokens;
 
@@ -255,7 +255,7 @@ public:
     vector<string> program;
     vector<Token> tokens;
 
-    Lexer (string s)
+    Lexer (const string& s)
     {
         program = split(s);
         tokens = addTokens(program);

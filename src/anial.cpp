@@ -4,23 +4,12 @@
 using std::ifstream;
 using std::ofstream;
 
-int main ( int argc, const char* argv[] ) {
-
-/*
-    if (argc < 2)
-    {
-        cerr << "\033[31mArgumentsError: Too few arguments for the program.\033[0m";
-        exit(1);
-    }
-
-    if (argc > 2)
-    {
-        cerr << "\033[31mArgumentsError: Too many arguments for the program.\033[0m";
-        exit(1);
-    }
-*/
+int main ( int argc, const char* args[] ) {
+    
     string sourceCode;
     vector<Token> tokens;
+
+    // Hint: You can also dynamically allocate the above variables in the heap to save up space (do it later)
 
     {
         ifstream fin;
@@ -37,15 +26,13 @@ int main ( int argc, const char* argv[] ) {
         fin.close();
     }
 
-    cout << sourceCode;
-    
     {
         Lexer lexer(sourceCode);
         tokens = lexer.tokens;
     }
 
     {
-        Parser parser (tokens);
+        Parser parser(tokens);
     }
     
     return 0;
