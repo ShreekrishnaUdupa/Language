@@ -5,7 +5,20 @@ using std::ifstream;
 using std::ofstream;
 
 int main ( int argc, const char* args[] ) {
-    
+
+/*
+    if (argc < 2)
+    {
+        cerr << "\033[31mArgumentsError: Too few arguments for the program.\033[0m";
+        exit(1);
+    }
+
+    if (argc > 2)
+    {
+        cerr << "\033[31mArgumentsError: Too many arguments for the program.\033[0m";
+        exit(1);
+    }
+*/
     string sourceCode;
     vector<Token> tokens;
 
@@ -14,6 +27,12 @@ int main ( int argc, const char* args[] ) {
     {
         ifstream fin;
         fin.open("File.anial");
+
+        if (!fin)
+        {
+            cerr << "\033[31mFileError: could not be opened or doesn't exist.\033[0m";
+            exit(1);
+        }
 
         string temp;
 
