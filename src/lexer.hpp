@@ -74,99 +74,219 @@ private:
             {
                 case '.':
                     if (temp != "")
-                        program.push_back(temp);
+                        program.push_back(temp), temp.clear();
 
                     program.push_back(".");
-                    temp.clear();
                     break;
 
                 case ';':
                     if (temp != "")
-                        program.push_back(temp);
+                        program.push_back(temp), temp.clear();
 
                     program.push_back(";");
-                    temp.clear();
                     break;
 
                 case '{':
                     if (temp != "")
-                        program.push_back(temp);
+                        program.push_back(temp), temp.clear();
 
                     program.push_back("{");
-                    temp.clear();
                     break;
 
                 case '}':
                     if (temp != "")
-                        program.push_back(temp);
+                        program.push_back(temp), temp.clear();
 
                     program.push_back("}");
-                    temp.clear();
                     break;
 
                 case '(':
                     if (temp != "")
-                        program.push_back(temp);
+                        program.push_back(temp), temp.clear();
 
                     program.push_back("(");
-                    temp.clear();
                     break;
 
                 case ')':
                     if (temp != "")
-                        program.push_back(temp);
+                        program.push_back(temp), temp.clear();
 
                     program.push_back(")");
-                    temp.clear();
                     break;
 
                 case '=':
                     if (temp != "")
-                        program.push_back(temp);
+                        program.push_back(temp), temp.clear();
 
-                    program.push_back("=");
-                    temp.clear();
+                    if (s[i+1] == '=')
+                        program.push_back("=="), ++i;
+                    
+                    else
+                        program.push_back("=");
+
                     break;
 
                 case '+':
                     if (temp != "")
-                        program.push_back(temp);
+                        program.push_back(temp), temp.clear();
 
-                    program.push_back("+");
-                    temp.clear();
+                    if (s[i+1] == '=')
+                        program.push_back("+="), ++i;
+                    
+                    else if (s[i+1] == '+')
+                        program.push_back("++"), ++i;
+
+                    else
+                        program.push_back("+");
+
                     break;
 
                 case '-':
                     if (temp != "")
-                        program.push_back(temp);
+                        program.push_back(temp), temp.clear();
 
-                    program.push_back("-");
-                    temp.clear();
+                    if (s[i+1] == '=')
+                        program.push_back("-="), ++i;
+                    
+                    else if (s[i+1] == '-')
+                        program.push_back("--"), ++i;
+
+                    else
+                        program.push_back("-");
+
                     break;
 
                 case '*':
                     if (temp != "")
-                        program.push_back(temp);
+                        program.push_back(temp), temp.clear();
 
-                    program.push_back("*");
-                    temp.clear();
+                    if (s[i+1] == '=')
+                        program.push_back("*="), ++i;
+
+                    else
+                        program.push_back("*");
+
                     break;
 
                 case '/':
                     if (temp != "")
-                        program.push_back(temp);
+                        program.push_back(temp), temp.clear();
 
-                    program.push_back("/");
-                    temp.clear();
+                    if (s[i+1] == '=')
+                        program.push_back("/="), ++i;
+
+                    else
+                        program.push_back("/");
+
                     break;
 
                 case '%':
                     if (temp != "")
-                        program.push_back(temp);
+                        program.push_back(temp), temp.clear();
 
-                    program.push_back("%");
-                    temp.clear();
-                    break;           
+                    if (s[i+1] == '=')
+                        program.push_back("%="), ++i;
+
+                    else
+                        program.push_back("%");
+                    break;
+
+                case '|':
+                    if (temp != "")
+                        program.push_back(temp), temp.clear();
+
+                    if (s[i+1] == '=')
+                        program.push_back("|="), ++i;
+
+                    else if (s[i+1] == '|')
+                        program.push_back("||"), ++i;
+
+                    else
+                        program.push_back("|");
+                    
+                    break;
+
+                case '&':
+                    if (temp != "")
+                        program.push_back(temp), temp.clear();
+
+                    if (s[i+1] == '=')
+                        program.push_back("&="), ++i;
+
+                    else if (s[i+1] == '&')
+                        program.push_back("&&"), ++i;
+
+                    else
+                        program.push_back("&");
+                    
+                    break;
+
+                case '^':
+                    if (temp != "")
+                    program.push_back(temp), temp.clear();
+
+                    if (s[i+1] == '=')
+                        program.push_back("^="), ++i;
+
+                    else
+                        program.push_back("^");
+
+                    break;
+
+                case '~':
+                    if (temp != "")
+                        program.push_back(temp), temp.clear();
+
+                    program.push_back("~");
+                    break;
+
+                case '<':
+                    if (temp != "")
+                        program.push_back(temp), temp.clear();
+
+                    if (s[i+1] == '=')
+                        program.push_back("<="), ++i;
+                    
+                    else if (s[i+1] == '<')
+                    {
+                        if (s[i+2] == '=' ) program.push_back("<<="), i += 2;
+                        else program.push_back("<<"), ++i;
+                    }
+
+                    else
+                        program.push_back("<");
+
+                    break;
+
+                case '>':
+                    if (temp != "")
+                        program.push_back(temp), temp.clear();
+
+                    if (s[i+1] == '=')
+                        program.push_back(">="), ++i;
+                    
+                    else if (s[i+1] == '>')
+                    {
+                        if (s[i+2] == '=' ) program.push_back(">>="), i += 2;
+                        else program.push_back(">>"), ++i;
+                    }
+
+                    else
+                        program.push_back(">");
+
+                    break;
+
+                case '!':
+                    if (temp != "")
+                    program.push_back(temp), temp.clear();
+
+                    if (s[i+1] == '=')
+                        program.push_back("!="), ++i;
+
+                    else
+                        program.push_back("!");
+
+                    break;
             }
 
             if ( (s[i] >= 'a' && s[i] <= 'z') || (s[i] >= 'A' && s[i] <= 'Z') || (s[i] >= '0' && s[i] <= '9') || s[i] == '_' )
@@ -190,24 +310,6 @@ private:
         return program;
     }
 
-    void validateTokens (const vector<Token>& tokens) {
-
-        for (const auto& value: tokens) {
-
-            if (value.type == literal && value.value[0] >= '0' && value.value[0] <= '9')
-            {
-                for (const auto& num: value.value)
-                {
-                    if(!(num >= '0' && num <= '9'))
-                    {
-                        cerr << "\033[31mTokenError: Illegal Literal.\033[0m";
-                        exit(1);
-                    }
-                }
-            }
-        }
-    }
-
     vector<Token> addTokens (const vector<string>& program) {
 
         vector<Token> tokens;
@@ -221,6 +323,7 @@ private:
             else if (value == "}") tokens.push_back({close_brace, "}"});
             else if (value == "(") tokens.push_back({open_paren, "("});
             else if (value == ")") tokens.push_back({close_paren, ")"});
+
             else if (value == "=") tokens.push_back({assignment, "="});
 
             // Operators
@@ -230,9 +333,38 @@ private:
             else if (value == "*") tokens.push_back({op, "*"});
             else if (value == "/") tokens.push_back({op, "/"});
             else if (value == "%") tokens.push_back({op, "%"});
+            else if (value == "++") tokens.push_back({op, "++"});
+            else if (value == "--") tokens.push_back({op, "--"});
 
-            else if (value == "true" || value == "false")
-                tokens.push_back({literal, value});
+            else if (value == "<") tokens.push_back({op, "<"});
+            else if (value == ">") tokens.push_back({op, ">"});
+            else if (value == "<=") tokens.push_back({op, "<="});
+            else if (value == ">=") tokens.push_back({op, ">="});
+            else if (value == "==") tokens.push_back({op, "=="});
+            else if (value == "!=") tokens.push_back({op, "!="});
+
+            else if (value == "||") tokens.push_back({op, "||"});
+            else if (value == "&&") tokens.push_back({op, "&&"});
+            else if (value == "!") tokens.push_back({op, "!"});
+
+            else if (value == "|") tokens.push_back({op, "|"});
+            else if (value == "&") tokens.push_back({op, "&"});
+            else if (value == "^") tokens.push_back({op, "^"});
+            else if (value == "~") tokens.push_back({op, "~"});
+            else if (value == "<<") tokens.push_back({op, "<<"});
+            else if (value == ">>") tokens.push_back({op, ">>"});
+
+            else if (value == "+=") tokens.push_back({op, "+="});
+            else if (value == "-=") tokens.push_back({op, "-="});
+            else if (value == "*=") tokens.push_back({op, "*="});
+            else if (value == "/=") tokens.push_back({op, "/="});
+            else if (value == "%=") tokens.push_back({op, "%="});
+
+            else if (value == "nor") tokens.push_back({op, "nor"});
+            else if (value == "nand") tokens.push_back({op, "nand"});
+
+            else if (value == "true") tokens.push_back({literal, "true"});
+            else if (value == "false") tokens.push_back({literal, "false"});
 
             else if (value == "class" || value == "void" || value == "main" || value == "Int" || value == "Bool")
                 tokens.push_back({keyword, value});
@@ -249,6 +381,24 @@ private:
 
         validateTokens(tokens);
         return tokens;
+    }
+
+    void validateTokens (const vector<Token>& tokens) {
+
+        for (const auto& value: tokens) {
+
+            if (value.type == literal && value.value[0] >= '0' && value.value[0] <= '9')
+            {
+                for (const auto& num: value.value)
+                {
+                    if(!(num >= '0' && num <= '9'))
+                    {
+                        cerr << "\033[31mTokenError: Illegal Literal.\033[0m";
+                        exit(1);
+                    }
+                }
+            }
+        }
     }
 
 public:

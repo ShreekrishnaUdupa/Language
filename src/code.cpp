@@ -157,17 +157,17 @@ Bool operator * (const Bool& a, const Bool& b) { return Bool(a.value * b.value);
 Bool operator / (const Bool& a, const Bool& b) { return Bool(a.value / b.value); }
 Bool operator % (const Bool& a, const Bool& b) { return Bool(a.value % b.value); }
 
-Int operator + (const int value, const Int& a) { return Int(value + a.value); }
-Int operator - (const int value, const Int& a) { return Int(value - a.value); }
-Int operator * (const int value, const Int& a) { return Int(value * a.value); }
-Int operator / (const int value, const Int& a) { return Int(value / a.value); }
-Int operator % (const int value, const Int& a) { return Int(value % a.value); }
+Int operator + (const Int& a, const Bool& b) { return Int(a.value + b.value); }
+Int operator - (const Int& a, const Bool& b) { return Int(a.value - b.value); }
+Int operator * (const Int& a, const Bool& b) { return Int(a.value * b.value); }
+Int operator / (const Int& a, const Bool& b) { return Int(a.value / b.value); }
+Int operator % (const Int& a, const Bool& b) { return Int(a.value % b.value); }
 
-Int operator + (const Int& a, int value) { return Int(a.value + value); }
-Int operator - (const Int& a, int value) { return Int(a.value + value); }
-Int operator * (const Int& a, int value) { return Int(a.value + value); }
-Int operator / (const Int& a, int value) { return Int(a.value + value); }
-Int operator % (const Int& a, int value) { return Int(a.value + value); }
+template <typename T> Int operator + (const T& value, const Int& a) { return Int(value + a.value); }
+template <typename T> Int operator + (const T& value, const Int& a) { return Int(value + a.value); }
+template <typename T> Int operator + (const T& value, const Int& a) { return Int(value + a.value); }
+template <typename T> Int operator + (const T& value, const Int& a) { return Int(value + a.value); }
+template <typename T> Int operator + (const T& value, const Int& a) { return Int(value + a.value); }
 
 int main ()
 {
