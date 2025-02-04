@@ -54,7 +54,7 @@ private:
                 case 'F': value = 240; break;
 
                 default:
-                    cerr << "\033Error: Invalid Hexcode.\033[0m";
+                    cerr << "\033[31mError: Invalid Hexcode.\033[0m";
                     exit(1);
             }
         }
@@ -80,7 +80,7 @@ private:
                 case 'F': value += 15; break;
 
                 default:
-                    cerr << "\033Error: Invalid hexcode.\033[0m";
+                    cerr << "\033[31mError: Invalid hexcode.\033[0m";
                     exit(1);
             }
         }
@@ -96,13 +96,13 @@ private:
 
         if (hexCode.size() != 7)
         {
-            cerr << "\033Error: Invalid HexCode\033[0m";
+            cerr << "\033[31mError: Invalid HexCode\033[0m";
             exit(1);
         }
 
         if (hexCode[0] != '#')
         {
-            cerr << "\033Error: Invalid HexCode\033[0m";
+            cerr << "\033[31mError: Invalid HexCode\033[0m";
             exit(1);
         }
 
@@ -122,26 +122,20 @@ public:
         cout << s << '\n';
     }
 
-    inline void print (const char* s, string hexCode)
-    {
-        string str = escapeCode(hexCode) + s + "\033[0m";
-        cout << str;
+    inline void print (const char* s, string hexCode) {
+        cout << escapeCode(hexCode) + s + "\033[0m";
     }
 
-    inline void println (const char* s, string hexCode)
-    {
-        string str = escapeCode(hexCode) + s + "\033[0m";
-        cout << str << '\n';
+    inline void println (const char* s, string hexCode) {
+        cout << escapeCode(hexCode) + s + "\033[0m";
     }
 
     inline void print (const Int& a) {
         cout << a.value;
     }
 
-    inline void print (const Bool& a)
-    {
-        if (a.value == true) cout << "true";
-        else cout << "false";
+    inline void print (const Bool& a) {
+        cout << (a.value == true)? "true": "false";
     }
 };
 
@@ -163,16 +157,16 @@ Int operator * (const Int& a, const Bool& b) { return Int(a.value * b.value); }
 Int operator / (const Int& a, const Bool& b) { return Int(a.value / b.value); }
 Int operator % (const Int& a, const Bool& b) { return Int(a.value % b.value); }
 
-template <typename T> Int operator + (const T& value, const Int& a) { return Int(value + a.value); }
-template <typename T> Int operator + (const T& value, const Int& a) { return Int(value + a.value); }
-template <typename T> Int operator + (const T& value, const Int& a) { return Int(value + a.value); }
-template <typename T> Int operator + (const T& value, const Int& a) { return Int(value + a.value); }
-template <typename T> Int operator + (const T& value, const Int& a) { return Int(value + a.value); }
+// template <typename T> Int operator + (const T& value, const Int& a) { return Int(value + a.value); }
+// template <typename T> Int operator + (const T& value, const Int& a) { return Int(value + a.value); }
+// template <typename T> Int operator + (const T& value, const Int& a) { return Int(value + a.value); }
+// template <typename T> Int operator + (const T& value, const Int& a) { return Int(value + a.value); }
+// template <typename T> Int operator + (const T& value, const Int& a) { return Int(value + a.value); }
 
 int main ()
 {
     Console console;
 
-    console.print("This should be in some random color", "#11111");
+    console.print("This should be in some random color", "#111111");
     return 0;
 }

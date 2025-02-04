@@ -32,6 +32,17 @@ struct Token {
 };
 
 class Lexer {
+public:
+
+    vector<string> program;
+    vector<Token> tokens;
+
+    Lexer (const string& s)
+    {
+        program = split(s);
+        tokens = addTokens(program);
+    }
+
 private:
 
     vector<string> split (const string& s) {
@@ -248,10 +259,9 @@ private:
                         program.push_back("<="), ++i;
                     
                     else if (s[i+1] == '<')
-                    {
-                        if (s[i+2] == '=' ) program.push_back("<<="), i += 2;
-                        else program.push_back("<<"), ++i;
-                    }
+                                (s[i+2] == '=')?
+                                    (program.push_back("<<="), i+= 2):
+                                    (program.push_back("<<"), ++i);
 
                     else
                         program.push_back("<");
@@ -266,10 +276,9 @@ private:
                         program.push_back(">="), ++i;
                     
                     else if (s[i+1] == '>')
-                    {
-                        if (s[i+2] == '=' ) program.push_back(">>="), i += 2;
-                        else program.push_back(">>"), ++i;
-                    }
+                                (s[i+2] == '=')?
+                                    (program.push_back(">>="), i += 2):
+                                    (program.push_back(">>"), ++i);
 
                     else
                         program.push_back(">");
@@ -359,6 +368,8 @@ private:
             else if (value == "*=") tokens.push_back({op, "*="});
             else if (value == "/=") tokens.push_back({op, "/="});
             else if (value == "%=") tokens.push_back({op, "%="});
+            else if (value == "<<=") tokens.push_back({op, "<<="});
+            else if (value == ">>=") tokens.push_back({op, ">>="});
 
             else if (value == "nor") tokens.push_back({op, "nor"});
             else if (value == "nand") tokens.push_back({op, "nand"});
@@ -399,16 +410,6 @@ private:
                 }
             }
         }
-    }
-
-public:
-    vector<string> program;
-    vector<Token> tokens;
-
-    Lexer (const string& s)
-    {
-        program = split(s);
-        tokens = addTokens(program);
     }
 };
 
