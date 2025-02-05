@@ -1,11 +1,13 @@
 #include <iostream>
 #include <string>
+#include <concepts>
 
 using std::cin;
 using std::cout;
 using std::cerr;
 using std::string;
 using std::to_string;
+using std::is_same_v;
 
 class Int {
 public:
@@ -139,29 +141,23 @@ public:
     }
 };
 
-Int operator + (const Int& a, const Int& b) { return Int(a.value + b.value); }
-Int operator - (const Int& a, const Int& b) { return Int(a.value - b.value); }
-Int operator * (const Int& a, const Int& b) { return Int(a.value * b.value); }
-Int operator / (const Int& a, const Int& b) { return Int(a.value / b.value); }
-Int operator % (const Int& a, const Int& b) { return Int(a.value % b.value); }
+template <typename T>
+concept AllowedClass = is_same_v<T, Int> || is_same_v<T, Bool>;
 
-Bool operator + (const Bool& a, const Bool& b) { return Bool(a.value + b.value); }
-Bool operator - (const Bool& a, const Bool& b) { return Bool(a.value - b.value); }
-Bool operator * (const Bool& a, const Bool& b) { return Bool(a.value * b.value); }
-Bool operator / (const Bool& a, const Bool& b) { return Bool(a.value / b.value); }
-Bool operator % (const Bool& a, const Bool& b) { return Bool(a.value % b.value); }
+template <AllowedClass T, AllowedClass U>
+Int operator + (const T& a, const U& b) { return Int(a.value + b.value); }
 
-Int operator + (const Int& a, const Bool& b) { return Int(a.value + b.value); }
-Int operator - (const Int& a, const Bool& b) { return Int(a.value - b.value); }
-Int operator * (const Int& a, const Bool& b) { return Int(a.value * b.value); }
-Int operator / (const Int& a, const Bool& b) { return Int(a.value / b.value); }
-Int operator % (const Int& a, const Bool& b) { return Int(a.value % b.value); }
+template <AllowedClass T, AllowedClass U>
+Int operator - (const T& a, const U& b) { return Int(a.value - b.value); }
 
-// template <typename T> Int operator + (const T& value, const Int& a) { return Int(value + a.value); }
-// template <typename T> Int operator + (const T& value, const Int& a) { return Int(value + a.value); }
-// template <typename T> Int operator + (const T& value, const Int& a) { return Int(value + a.value); }
-// template <typename T> Int operator + (const T& value, const Int& a) { return Int(value + a.value); }
-// template <typename T> Int operator + (const T& value, const Int& a) { return Int(value + a.value); }
+template <AllowedClass T, AllowedClass U>
+Int operator * (const T& a, const U& b) { return Int(a.value * b.value); }
+
+template <AllowedClass T, AllowedClass U>
+Int operator / (const T& a, const U& b) { return Int(a.value / b.value); }
+
+template <AllowedClass T, AllowedClass U>
+Int operator % (const T& a, const U& b) { return Int(a.value % b.value); }
 
 int main ()
 {
