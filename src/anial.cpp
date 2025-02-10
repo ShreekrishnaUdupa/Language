@@ -1,4 +1,5 @@
 #include <fstream>
+#include "arguments.hpp"
 #include "interpreter.hpp"
 
 using std::ifstream;
@@ -6,22 +7,11 @@ using std::ofstream;
 
 int main ( int argc, const char* args[] ) {
 
-/*
-    if (argc < 2)
-    {
-        cerr << "\033[31mArgumentsError: Too few arguments for the program.\033[0m";
-        exit(1);
-    }
+    validateArguments(args[1]);
 
-    if (argc > 2)
-    {
-        cerr << "\033[31mArgumentsError: Too many arguments for the program.\033[0m";
-        exit(1);
-    }
-*/
     string sourceCode;
     vector<Token> tokens;
-
+    
     // Hint: You can also dynamically allocate the above variables in the heap to save up space (do it later)
 
     {
