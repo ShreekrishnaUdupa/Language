@@ -9,23 +9,25 @@ using std::cin, std::cout, std::cerr;
 using std::vector;
 using std::string;
 
+enum TokenType {
+    keyword,
+    identifier,
+    op,
+    literal,
+    dot,
+    open_brace,
+    close_brace,
+    open_paren,
+    close_paren,
+    semicolon,
+    assignment,
+    unknown
+};
+
+using enum TokenType;
+
 class Lexer {
 public:
-    enum TokenType {
-        keyword,
-        identifier,
-        op,
-        literal,
-        dot,
-        open_brace,
-        close_brace,
-        open_paren,
-        close_paren,
-        semicolon,
-        assignment,
-        unknown
-    };
-
     struct Token {
         TokenType type;
         string value;
