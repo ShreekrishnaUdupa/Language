@@ -24,15 +24,15 @@ enum TokenType {
     unknown
 };
 
+struct Token {
+    TokenType type;
+    string value;
+};
+
 using enum TokenType;
 
 class Lexer {
 public:
-    struct Token {
-        TokenType type;
-        string value;
-    };
-
     vector<string> program;
     vector<Token> tokens;
 
@@ -326,7 +326,7 @@ vector<string> Lexer::split (const string& s) {
     return program;
 }
 
-vector<Lexer::Token> Lexer::addTokens (const vector<string>& program) {
+vector<Token> Lexer::addTokens (const vector<string>& program) {
 
     vector<Token> tokens;
 
