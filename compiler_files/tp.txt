@@ -1,0 +1,165 @@
+"Main"          { return symbol_type {token::TOKEN_Main, {}}; }
+"main"          { return symbol_type {token::TOKEN_main, {}}; }
+"void"          { return symbol_type {token::VOID, {}}; }
+"return"        { return symbol_type {token::RETURN, {}}; }
+"public"        { return symbol_type {token::PUBLIC, {}}; }
+"private"       { return symbol_type {token::PRIVATE, {}}; }
+"protected"     { return symbol_type {token::PROTECTED, {}}; }
+"{"             { return symbol_type {token::LBRACE, {}}; }
+"}"             { return symbol_type {token::RBRACE, {}}; }
+"("             { return symbol_type {token::LPAREN, {}}; }
+")"             { return symbol_type {token::RPAREN, {}}; }
+"."             { return symbol_type {token::DOT, {}}; }
+
+"++"            { return symbol_type {token::INCREMENT, {}}; }
+"--"            { return symbol_type {token::DECREMENT, {}}; }
+"||"            { return symbol_type {token::LOGICAL_OR, {}}; }
+"&&"            { return symbol_type {token::LOGICAL_AND, {}}; }
+">="            { return symbol_type {token::GE, {}}; }
+"<="            { return symbol_type {token::LE, {}}; }
+"!="            { return symbol_type {token::NE, {}}; }
+"=="            { return symbol_type {token::E, {}}; }
+"+="            { return symbol_type {token::PLUS_ASSIGNMENT, {}}; }
+"-="            { return symbol_type {token::MINUS_ASSIGNMENT, {}}; }
+"*="            { return symbol_type {token::MULTIPLY_ASSIGNMENT, {}}; }
+"/="            { return symbol_type {token::DIVIDE_ASSIGNMENT, {}}; }
+"%="            { return symbol_type {token::MODULO_ASSIGNMENT, {}}; }
+"&="            { return symbol_type {token::BIT_AND_ASSIGNMENT, {}}; }
+"|="            { return symbol_type {token::BIT_OR_ASSIGNMENT, {}}; }
+"^="            { return symbol_type {token::BIT_XOR_ASSIGNMENT, {}}; }
+"<<="           { return symbol_type {token::LEFT_SHIFT_ASSIGNMENT, {}}; }
+">>="           { return symbol_type {token::RIGHT_SHIFT_ASSIGNMENT, {}}; }
+"<<"            { return symbol_type {token::LEFT_SHIFT, {}}; }
+">>"            { return symbol_type {token::RIGHT_SHIFT, {}}; }
+
+"+"             { return symbol_type {token::PLUS, {}}; }
+"-"             { return symbol_type {token::MINUS, {}}; }
+"*"             { return symbol_type {token::MULTIPLY, {}}; }
+"/"             { return symbol_type {token::DIVIDE, {}}; }
+"%"             { return symbol_type {token::MODULO, {}}; }
+"="             { return symbol_type {token::ASSIGNMENT, {}}; }
+">"             { return symbol_type {token::GREATER, {}}; }
+"<"             { return symbol_type {token::LESSER, {}}; }
+"!"             { return symbol_type {token::LOGICAL_NOT, {}}; }
+"&"             { return symbol_type {token::BIT_AND, {}}; }
+"|"             { return symbol_type {token::BIT_OR, {}}; }
+"^"             { return symbol_type {token::BIT_XOR, {}}; }
+"~"             { return symbol_type {token::BIT_NOT, {}}; }
+";"             { return symbol_type {token::SEMICOLON, {}}; }
+","             { return symbol_type {token::COMMA, {}}; }
+
+[a-zA-Z_][a-zA-Z0-9_]*      { return symbol_type {token::IDENTIFIER, string(yytext)}; }
+\"([^"\\]|\\.)*\"           { return symbol_type {token::STRING_LITERAL, string(yytext)}; }
+
+[+-]?([0-9]+\.[0-9]+|\.[0-9]+)([eE][+-]?[0-9]+)?    { return symbol_type {token::FLOATING_LITERAL, stod(yytext)}; }
+[+-]?[0-9]+([eE][+-]?[0-9]+)?                       { return symbol_type {token::INTEGER_LITERAL, stoi(yytext)}; }
+
+\/\*([^*]|\*+[^*/])*\*+\/       {} 
+\/\/[^\n]*                      {} 
+[ \n\t\r]+                      {}
+
+.                                                   { return symbol_type {token::UNKNOWN, {}}; }
+
+
+// bison file
+
+Program: Classes MainClass Classes
+       ;
+
+MainClass: "class" "Main" "{" "void" "main" "(" ")" "{" Statements "}" "}"
+         ;
+
+Classes: Classes ClassDef
+       | %empty
+       ;
+
+ClassDef: "class" IDENTIFIER "{" Functions "}"
+        ;
+
+AccessSpecifiers: "public" ':'
+                | "private" ':'
+                | "protected" ':'
+                | %empty
+                ;
+
+Functions: Functions AccessSpecifiers Function
+         | %empty
+         ;
+
+Function: IDENTIFIER IDENTIFIER "(" Arguments ")" "{" Statements "}"
+        ;
+
+Arguments: ArgumentList
+         | %empty
+         ;
+
+ArgumentList: IDENTIFIER IDENTIFIER
+            | ArgumentList "," IDENTIFIER IDENTIFIER
+            ;
+
+Statements: Statements Statement
+          | %empty
+          ;   
+
+Statement: Declaration
+         | Expression ";"
+         | "return" Expression ";"
+         | "return" ";"
+         | ";"
+         ;
+
+Declaration: IDENTIFIER IDENTIFIER Init MoreDeclarations ";"
+           ;
+
+Init: "=" Expression
+    | %empty
+    ;
+
+MoreDeclarations: MoreDeclarations "," IDENTIFIER Init
+                | %empty
+                ;
+
+Expression: Expression "+" Expression
+          | Expression "-" Expression
+          | Expression "*" Expression
+          | Expression "/" Expression
+          | Expression "%" Expression
+          | Expression "|" Expression
+          | Expression "&" Expression
+          | Expression ">" Expression
+          | Expression "<" Expression
+          | Expression "^" Expression
+          | Expression "<<" Expression
+          | Expression ">>" Expression
+          | Expression "||" Expression
+          | Expression "&&" Expression
+          | Expression ">=" Expression
+          | Expression "<=" Expression
+          | Expression "==" Expression
+          | Expression "!=" Expression
+          | "+" Expression %prec UPLUS
+          | "-" Expression %prec UMINUS
+          | "!" Expression
+          | "~" Expression
+          | "*" IDENTIFIER %prec DEREFERENCE
+          | "&" IDENTIFIER %prec ADDRESS_OF
+          | "++" IDENTIFIER %prec PRE_INCREMENT
+          | "--" IDENTIFIER %prec PRE_DECREMENT
+          | IDENTIFIER "++" %prec POST_INCREMENT
+          | IDENTIFIER "--" %prec POST_DECREMENT
+          | IDENTIFIER "=" Expression
+          | IDENTIFIER "+=" Expression
+          | IDENTIFIER "-=" Expression
+          | IDENTIFIER "*=" Expression
+          | IDENTIFIER "/=" Expression
+          | IDENTIFIER "%=" Expression
+          | IDENTIFIER "&=" Expression
+          | IDENTIFIER "|=" Expression
+          | IDENTIFIER "^=" Expression
+          | IDENTIFIER "<<=" Expression
+          | IDENTIFIER ">>=" Expression
+          | "(" Expression ")"
+          | IDENTIFIER
+          | INTEGER_LITERAL
+          | FLOATING_LITERAL
+          ;

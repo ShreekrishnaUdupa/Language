@@ -6,4 +6,5 @@ using std::string;
 
 void validateArguments (const char* arg)
 {
+    
 }

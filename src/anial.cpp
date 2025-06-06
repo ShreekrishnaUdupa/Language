@@ -16,11 +16,11 @@ int main ( int argc, const char* args[] ) {
 
     {
         ifstream fin;
-        fin.open("File.anial");
+        fin.open("file.anial");
 
         if (!fin)
         {
-            cerr << "\033[31mFileError: could not be opened or doesn't exist.\033[0m";
+            cerr << "\033[31mFileError: could not be opened or doesn't exist.\033[0m\n";
             exit(1);
         }
 
