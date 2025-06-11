@@ -1,12 +1,13 @@
 all:
 	make clean;
-	bison -dtv -o parser.cpp parser.y;
-	flex++ -o lexer.cpp lexer.l;
-	g++ -Wno-register -O3 -o program lexer.cpp parser.cpp
+	bison -tv -o parser.cpp parser.y;
+	flex -o lexer.cpp lexer.l;
+	g++ -O3 -I . -o anial lexer.cpp;
 
 test:
-	./program < file.anial;
+	./anial < file.anial || (Get-Content file.anial | ./anial )
 
 clean:
-	rm -rf lexer.cpp parser.cpp parser.hpp parser.output position.hh location.hh stack.hh program
+	rm -rf anial lexer.cpp parser.cpp parser.hpp parser.output;
 	clear;
+

@@ -1,39 +1,43 @@
+%language "c++"
+%skeleton "lalr1.cc"
+%require "3.2"
+
 %define api.namespace {yy}
 %define api.parser.class {parser}
-%define parse.error verbose
-%define api.location.file "location.hh"
+%define api.token.constructor
 %define api.value.type variant
-%define parse.trace
-%parse-param { yy::Scanner* scanner }
+%define parse.error verbose
 
 %code requires {
+    #include <iostream>
     #include <string>
-    using std::string;
+    #include <variant>
+
+    using namespace std;
 }
 
 %code {
-    #include <iostream>
-    #include <string>
-    using std::string;
-    using namespace std;
+    yyFlexLexer lexer;
 
-    void yyerror(const char* s) {
-        cerr << "Parse error: " << s << " at line " << yylineno << '\n';
+    yy::parser::symbol_type yylex () {
+        
+        short int t = lexer.yylex ();
+        
+        switch (t) {
+            case yy::parser::token::INTEGER_LITERAL:    return yy::parser::symbol_type (t, stoi(lexer.YYText()));
+            case yy::parser::token::FLOATING_LITERAL:   return yy::parser::symbol_type (t, stod(lexer.YYText()));
+            case yy::parser::token::STRING_LITERAL:     return yy::parser::symbol_type (t, lexer.YYText());
+            case yy::parser::token::IDENTIFIER:         return yy::parser::symbol_type (t, lexer.YYText());
+        }
+
+        return yy::parser::symbol_type (t);
     }
 }
 
-
-
-%start Program
-
-%token <string> IDENTIFIER
-%token <string> STRING_LITERAL
-%token <int> INTEGER_LITERAL
-%token <double> FLOATING_LITERAL
-
-%token <string> CLASS "class"
+%token CLASS "class"
 %token TOKEN_Main "Main"
 %token TOKEN_main "main"
+%token VOID "void"
 %token RETURN "return"
 %token PUBLIC "public"
 %token PROTECTED "protected"
@@ -43,7 +47,7 @@
 %token LPAREN "("
 %token RPAREN ")"
 %token DOT "."
-%token VOID "void"
+
 %token SEMICOLON ";"
 %token COMMA ","
 %token UNKNOWN
@@ -86,6 +90,11 @@
 %token LEFT_SHIFT_ASSIGNMENT "<<="
 %token RIGHT_SHIFT_ASSIGNMENT ">>="
 
+%token <int> INTEGER_LITERAL
+%token <double> FLOATING_LITERAL
+%token <string> STRING_LITERAL
+%token <string> IDENTIFIER
+
 %left ","
 %right "=" "+=" "-=" "*=" "/=" "%=" "&=" "|=" "^=" "<<=" ">>="
 %left "||"
@@ -102,16 +111,123 @@
 %left POST_INCREMENT POST_DECREMENT
 %left "("
 
+%start program
+
 %%
-Program: %empty;
+program: classes mainClass classes {cout << "Valid program!\n"; }
+       ;
+
+mainClass: "class" "Main" "{" "void" "main" "(" ")" "{" statements "}" "}" optionalSemicolons
+         ;
+
+classes: classes classDef
+       | %empty
+       ;
+
+classDef: "class" IDENTIFIER "{" functions "}" optionalSemicolons
+        ;
+
+optionalSemicolons: optionalSemicolons ";"
+                  | %empty
+                  ;
+
+accessSpecifiers: "public" ':'
+                | "private" ':'
+                | "protected" ':'
+                | %empty
+                ;
+
+functions: functions accessSpecifiers function
+         | %empty
+         ;
+
+function: IDENTIFIER IDENTIFIER "(" arguments ")" "{" statements "}"
+        ;
+
+arguments: argumentList
+         | %empty
+         ;
+
+argumentList: IDENTIFIER IDENTIFIER
+            | argumentList "," IDENTIFIER IDENTIFIER
+            ;
+
+statements: statements statement
+          | %empty
+          ;   
+
+statement: declaration
+         | expression ";"
+         | "return" expression ";"
+         | "return" ";"
+         | ";"
+         ;
+
+declaration: IDENTIFIER IDENTIFIER init moreDeclarations ";"
+           ;
+
+init: "=" expression
+    | %empty
+    ;
+
+moreDeclarations: moreDeclarations "," IDENTIFIER init
+                | %empty
+                ;
+
+expression: expression "+" expression
+          | expression "-" expression
+          | expression "*" expression
+          | expression "/" expression
+          | expression "%" expression
+          | expression "|" expression
+          | expression "&" expression
+          | expression ">" expression
+          | expression "<" expression
+          | expression "^" expression
+          | expression "<<" expression
+          | expression ">>" expression
+          | expression "||" expression
+          | expression "&&" expression
+          | expression ">=" expression
+          | expression "<=" expression
+          | expression "==" expression
+          | expression "!=" expression
+          | "+" expression %prec UPLUS
+          | "-" expression %prec UMINUS
+          | "!" expression
+          | "~" expression
+          | "*" IDENTIFIER %prec DEREFERENCE
+          | "&" IDENTIFIER %prec ADDRESS_OF
+          | "++" IDENTIFIER %prec PRE_INCREMENT
+          | "--" IDENTIFIER %prec PRE_DECREMENT
+          | IDENTIFIER "++" %prec POST_INCREMENT
+          | IDENTIFIER "--" %prec POST_DECREMENT
+          | IDENTIFIER "=" expression
+          | IDENTIFIER "+=" expression
+          | IDENTIFIER "-=" expression
+          | IDENTIFIER "*=" expression
+          | IDENTIFIER "/=" expression
+          | IDENTIFIER "%=" expression
+          | IDENTIFIER "&=" expression
+          | IDENTIFIER "|=" expression
+          | IDENTIFIER "^=" expression
+          | IDENTIFIER "<<=" expression
+          | IDENTIFIER ">>=" expression
+          | "(" expression ")"
+          | IDENTIFIER
+          | INTEGER_LITERAL
+          | FLOATING_LITERAL
+          ;
 %%
+
+void yy::parser::error(const std::string& msg) {
+    cerr << msg << ";";
+}
 
 int main () {
-	yy::parser parser;
-	return parser.parse();
-}
 
-void yyerror(const char* s) {
-	cerr << "Parse error: " << s << " at line " << yylineno << '\n';
-}
+    yy::parser p;
+    p.parse ();
 
+    return 0;
+}
