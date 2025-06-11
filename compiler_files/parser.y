@@ -6,7 +6,8 @@
 %define api.parser.class {parser}
 %define api.token.constructor
 %define api.value.type variant
-%define parse.error verbose
+%define parse.error detailed
+%define parse.lac full
 
 %code requires {
     #include <iostream>
@@ -17,20 +18,18 @@
 }
 
 %code {
-    yyFlexLexer lexer;
+    class Lexer: public yyFlexLexer {
+    public:
+        yy::parser::symbol_type scan ();
+    };
 
     yy::parser::symbol_type yylex () {
-        
-        short int t = lexer.yylex ();
-        
-        switch (t) {
-            case yy::parser::token::INTEGER_LITERAL:    return yy::parser::symbol_type (t, stoi(lexer.YYText()));
-            case yy::parser::token::FLOATING_LITERAL:   return yy::parser::symbol_type (t, stod(lexer.YYText()));
-            case yy::parser::token::STRING_LITERAL:     return yy::parser::symbol_type (t, lexer.YYText());
-            case yy::parser::token::IDENTIFIER:         return yy::parser::symbol_type (t, lexer.YYText());
-        }
+        static Lexer lexer;
+        return lexer.scan ();
+    }
 
-        return yy::parser::symbol_type (t);
+    void yy::parser::error (const std::string& msg) {
+        cerr << msg;
     }
 }
 
@@ -89,6 +88,7 @@
 %token BIT_XOR_ASSIGNMENT "^="
 %token LEFT_SHIFT_ASSIGNMENT "<<="
 %token RIGHT_SHIFT_ASSIGNMENT ">>="
+%token YYEOF 0
 
 %token <int> INTEGER_LITERAL
 %token <double> FLOATING_LITERAL
@@ -114,7 +114,7 @@
 %start program
 
 %%
-program: classes mainClass classes {cout << "Valid program!\n"; }
+program: classes mainClass classes YYEOF {cout << "Valid program!\n"; }
        ;
 
 mainClass: "class" "Main" "{" "void" "main" "(" ")" "{" statements "}" "}" optionalSemicolons
@@ -219,10 +219,6 @@ expression: expression "+" expression
           | FLOATING_LITERAL
           ;
 %%
-
-void yy::parser::error(const std::string& msg) {
-    cerr << msg << ";";
-}
 
 int main () {
 

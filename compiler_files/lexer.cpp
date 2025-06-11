@@ -483,9 +483,15 @@ static const flex_int16_t yy_chk[206] =
 #include "parser.cpp"
 
 using namespace std;
-using token = yy::parser::token;
-#line 487 "lexer.cpp"
-#line 488 "lexer.cpp"
+using namespace yy;
+
+int yyFlexLexer::yylex () {
+    return 0;
+}
+
+#define YY_DECL yy::parser::symbol_type Lexer::scan ()
+#line 493 "lexer.cpp"
+#line 494 "lexer.cpp"
 
 #define INITIAL 0
 
@@ -617,9 +623,9 @@ YY_DECL
 		}
 
 	{
-#line 13 "lexer.l"
+#line 19 "lexer.l"
 
-#line 622 "lexer.cpp"
+#line 628 "lexer.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -678,297 +684,297 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 14 "lexer.l"
-{ return token::CLASS; }
+#line 20 "lexer.l"
+{ return parser::make_CLASS (); }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 15 "lexer.l"
-{ return token::TOKEN_Main; }
+#line 21 "lexer.l"
+{ return parser::make_TOKEN_Main (); }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 16 "lexer.l"
-{ return token::TOKEN_main; }
+#line 22 "lexer.l"
+{ return parser::make_TOKEN_main (); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 17 "lexer.l"
-{ return token::VOID; }
+#line 23 "lexer.l"
+{ return parser::make_VOID (); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 18 "lexer.l"
-{ return token::RETURN; }
+#line 24 "lexer.l"
+{ return parser::make_RETURN (); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 19 "lexer.l"
-{ return token::PUBLIC; }
+#line 25 "lexer.l"
+{ return parser::make_PUBLIC (); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 20 "lexer.l"
-{ return token::PRIVATE; }
+#line 26 "lexer.l"
+{ return parser::make_PRIVATE (); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 21 "lexer.l"
-{ return token::PROTECTED; }
+#line 27 "lexer.l"
+{ return parser::make_PROTECTED (); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 22 "lexer.l"
-{ return token::LBRACE; }
+#line 28 "lexer.l"
+{ return parser::make_LBRACE (); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 23 "lexer.l"
-{ return token::RBRACE; }
+#line 29 "lexer.l"
+{ return parser::make_RBRACE (); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 24 "lexer.l"
-{ return token::LPAREN; }
+#line 30 "lexer.l"
+{ return parser::make_LPAREN (); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 25 "lexer.l"
-{ return token::RPAREN; }
+#line 31 "lexer.l"
+{ return parser::make_RPAREN (); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 27 "lexer.l"
-{ return token::INCREMENT; }
+#line 33 "lexer.l"
+{ return parser::make_INCREMENT (); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 28 "lexer.l"
-{ return token::DECREMENT; }
+#line 34 "lexer.l"
+{ return parser::make_DECREMENT (); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 29 "lexer.l"
-{ return token::LOGICAL_OR; }
+#line 35 "lexer.l"
+{ return parser::make_LOGICAL_OR (); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 30 "lexer.l"
-{ return token::LOGICAL_AND; }
+#line 36 "lexer.l"
+{ return parser::make_LOGICAL_AND (); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 31 "lexer.l"
-{ return token::GE; }
+#line 37 "lexer.l"
+{ return parser::make_GE (); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 32 "lexer.l"
-{ return token::LE; }
+#line 38 "lexer.l"
+{ return parser::make_LE (); }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 33 "lexer.l"
-{ return token::NE; }
+#line 39 "lexer.l"
+{ return parser::make_NE (); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 34 "lexer.l"
-{ return token::E; }
+#line 40 "lexer.l"
+{ return parser::make_E (); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 35 "lexer.l"
-{ return token::PLUS_ASSIGNMENT; }
+#line 41 "lexer.l"
+{ return parser::make_PLUS_ASSIGNMENT (); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 36 "lexer.l"
-{ return token::MINUS_ASSIGNMENT; }
+#line 42 "lexer.l"
+{ return parser::make_MINUS_ASSIGNMENT (); }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 37 "lexer.l"
-{ return token::MULTIPLY_ASSIGNMENT; }
+#line 43 "lexer.l"
+{ return parser::make_MULTIPLY_ASSIGNMENT (); }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 38 "lexer.l"
-{ return token::DIVIDE_ASSIGNMENT; }
+#line 44 "lexer.l"
+{ return parser::make_DIVIDE_ASSIGNMENT (); }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 39 "lexer.l"
-{ return token::MODULO_ASSIGNMENT; }
+#line 45 "lexer.l"
+{ return parser::make_MODULO_ASSIGNMENT (); }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 40 "lexer.l"
-{ return token::BIT_OR_ASSIGNMENT; }
+#line 46 "lexer.l"
+{ return parser::make_BIT_OR_ASSIGNMENT (); }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 41 "lexer.l"
-{ return token::BIT_AND_ASSIGNMENT; }
+#line 47 "lexer.l"
+{ return parser::make_BIT_AND_ASSIGNMENT (); }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 42 "lexer.l"
-{ return token::BIT_XOR_ASSIGNMENT; }
+#line 48 "lexer.l"
+{ return parser::make_BIT_XOR_ASSIGNMENT (); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 43 "lexer.l"
-{ return token::LEFT_SHIFT_ASSIGNMENT; }
+#line 49 "lexer.l"
+{ return parser::make_LEFT_SHIFT_ASSIGNMENT (); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 44 "lexer.l"
-{ return token::RIGHT_SHIFT_ASSIGNMENT; }
+#line 50 "lexer.l"
+{ return parser::make_RIGHT_SHIFT_ASSIGNMENT (); }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 45 "lexer.l"
-{ return token::LEFT_SHIFT; }
+#line 51 "lexer.l"
+{ return parser::make_LEFT_SHIFT (); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 46 "lexer.l"
-{ return token::RIGHT_SHIFT; }
+#line 52 "lexer.l"
+{ return parser::make_RIGHT_SHIFT (); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 48 "lexer.l"
-{ return token::MULTIPLY; }
+#line 54 "lexer.l"
+{ return parser::make_MULTIPLY (); }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 49 "lexer.l"
-{ return token::DIVIDE; }
+#line 55 "lexer.l"
+{ return parser::make_DIVIDE (); }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 50 "lexer.l"
-{ return token::MODULO; }
+#line 56 "lexer.l"
+{ return parser::make_MODULO (); }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 51 "lexer.l"
-{ return token::ASSIGNMENT; }
+#line 57 "lexer.l"
+{ return parser::make_ASSIGNMENT (); }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 52 "lexer.l"
-{ return token::GREATER; }
+#line 58 "lexer.l"
+{ return parser::make_GREATER (); }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 53 "lexer.l"
-{ return token::LESSER; }
+#line 59 "lexer.l"
+{ return parser::make_LESSER (); }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 54 "lexer.l"
-{ return token::LOGICAL_NOT; }
+#line 60 "lexer.l"
+{ return parser::make_LOGICAL_NOT (); }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 55 "lexer.l"
-{ return token::BIT_AND; }
+#line 61 "lexer.l"
+{ return parser::make_BIT_AND (); }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 56 "lexer.l"
-{ return token::BIT_OR; }
+#line 62 "lexer.l"
+{ return parser::make_BIT_OR (); }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 57 "lexer.l"
-{ return token::BIT_XOR; }
+#line 63 "lexer.l"
+{ return parser::make_BIT_XOR (); }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 58 "lexer.l"
-{ return token::BIT_NOT; }
+#line 64 "lexer.l"
+{ return parser::make_BIT_NOT (); }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 59 "lexer.l"
-{ return token::SEMICOLON; }
+#line 65 "lexer.l"
+{ return parser::make_SEMICOLON (); }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 60 "lexer.l"
-{ return token::COMMA; }
+#line 66 "lexer.l"
+{ return parser::make_COMMA (); }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 62 "lexer.l"
-{ return token::FLOATING_LITERAL; }
+#line 68 "lexer.l"
+{ return parser::make_FLOATING_LITERAL (stod(yytext)); }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 63 "lexer.l"
-{ return token::INTEGER_LITERAL; }
+#line 69 "lexer.l"
+{ return parser::make_INTEGER_LITERAL (stoi(yytext)); }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 65 "lexer.l"
-{ return token::IDENTIFIER; }
+#line 71 "lexer.l"
+{ return parser::make_IDENTIFIER (yytext); }
 	YY_BREAK
 case 49:
 /* rule 49 can match eol */
 YY_RULE_SETUP
-#line 66 "lexer.l"
-{ return token::STRING_LITERAL; }
+#line 72 "lexer.l"
+{ return parser::make_STRING_LITERAL (yytext); }
 	YY_BREAK
 case 50:
 /* rule 50 can match eol */
 YY_RULE_SETUP
-#line 68 "lexer.l"
-{} 
+#line 74 "lexer.l"
+{}
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 69 "lexer.l"
+#line 75 "lexer.l"
 {} 
 	YY_BREAK
 case 52:
 /* rule 52 can match eol */
 YY_RULE_SETUP
-#line 70 "lexer.l"
+#line 76 "lexer.l"
 {}
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 72 "lexer.l"
-{ return token::DOT; }
+#line 78 "lexer.l"
+{ return parser::make_DOT (); }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 73 "lexer.l"
-{ return token::PLUS; }
+#line 79 "lexer.l"
+{ return parser::make_PLUS (); }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 74 "lexer.l"
-{ return token::MINUS; }
+#line 80 "lexer.l"
+{ return parser::make_MINUS (); }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 76 "lexer.l"
-{ return token::UNKNOWN; }
+#line 82 "lexer.l"
+{ return parser::make_UNKNOWN (); }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 77 "lexer.l"
-{ return token::YYEOF; }
+#line 83 "lexer.l"
+{ return parser::make_YYEOF (); }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 78 "lexer.l"
-ECHO;
+#line 84 "lexer.l"
+YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
-#line 971 "lexer.cpp"
+#line 977 "lexer.cpp"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1929,7 +1935,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 78 "lexer.l"
+#line 84 "lexer.l"
 
 
 /* yyleng: returns the length of the string matched */

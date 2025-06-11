@@ -39,7 +39,7 @@
 
 
 // "%code requires" blocks.
-#line 11 "parser.y"
+#line 12 "parser.y"
 
     #include <iostream>
     #include <string>
@@ -428,7 +428,7 @@ namespace yy {
       enum token_kind_type
       {
         YYEMPTY = -2,
-    YYEOF = 0,                     // "end of file"
+    YYEOF = 0,                     // YYEOF
     YYerror = 256,                 // error
     YYUNDEF = 257,                 // "invalid token"
     CLASS = 258,                   // "class"
@@ -510,7 +510,7 @@ namespace yy {
       {
         YYNTOKENS = 65, ///< Number of tokens.
         S_YYEMPTY = -2,
-        S_YYEOF = 0,                             // "end of file"
+        S_YYEOF = 0,                             // YYEOF
         S_YYerror = 1,                           // error
         S_YYUNDEF = 2,                           // "invalid token"
         S_CLASS = 3,                             // "class"
@@ -741,7 +741,7 @@ switch (yykind)
       }
 
       /// The user-facing name of this symbol.
-      std::string name () const YY_NOEXCEPT
+      const char *name () const YY_NOEXCEPT
       {
         return parser::symbol_name (this->kind ());
       }
@@ -894,7 +894,7 @@ switch (yykind)
 
     /// The user-facing name of the symbol whose (internal) number is
     /// YYSYMBOL.  No bounds checking.
-    static std::string symbol_name (symbol_kind_type yysymbol);
+    static const char *symbol_name (symbol_kind_type yysymbol);
 
     // Implementation of make_symbol for each token kind.
 #if 201103L <= YY_CPLUSPLUS
@@ -1883,6 +1883,16 @@ switch (yykind)
     parser& operator= (const parser&);
 #endif
 
+    /// Check the lookahead yytoken.
+    /// \returns  true iff the token will be eventually shifted.
+    bool yy_lac_check_ (symbol_kind_type yytoken) const;
+    /// Establish the initial context if no initial context currently exists.
+    /// \returns  true iff the token will be eventually shifted.
+    bool yy_lac_establish_ (symbol_kind_type yytoken);
+    /// Discard any previous initial lookahead context because of event.
+    /// \param event  the event which caused the lookahead to be discarded.
+    ///               Only used for debbuging output.
+    void yy_lac_discard_ (const char* event);
 
     /// Stored state numbers (used for stacks).
     typedef unsigned char state_type;
@@ -1915,11 +1925,6 @@ switch (yykind)
     /// are valid, yet not members of the token_kind_type enum.
     static symbol_kind_type yytranslate_ (int t) YY_NOEXCEPT;
 
-    /// Convert the symbol name \a n to a form suitable for a diagnostic.
-    static std::string yytnamerr_ (const char *yystr);
-
-    /// For a symbol, its name in clear.
-    static const char* const yytname_[];
 
 
     // Tables.
@@ -2163,6 +2168,15 @@ switch (yykind)
 
     /// The stack.
     stack_type yystack_;
+    /// The stack for LAC.
+    /// Logically, the yy_lac_stack's lifetime is confined to the function
+    /// yy_lac_check_. We just store it as a member of this class to hold
+    /// on to the memory and to avoid frequent reallocations.
+    /// Since yy_lac_check_ is const, this member must be mutable.
+    mutable std::vector<state_type> yylac_stack_;
+    /// Whether an initial LAC context was established.
+    bool yy_lac_established_;
+
 
     /// Push a new state on the stack.
     /// \param m    a debug message to display
@@ -2370,7 +2384,7 @@ switch (yykind)
 
 #line 5 "parser.y"
 } // yy
-#line 2374 "parser.cpp"
+#line 2388 "parser.cpp"
 
 
 
@@ -2378,25 +2392,23 @@ switch (yykind)
 
 
 // Unqualified %code blocks.
-#line 19 "parser.y"
+#line 20 "parser.y"
 
-    yyFlexLexer lexer;
+    class Lexer: public yyFlexLexer {
+    public:
+        yy::parser::symbol_type scan ();
+    };
 
     yy::parser::symbol_type yylex () {
-        
-        short int t = lexer.yylex ();
-        
-        switch (t) {
-            case yy::parser::token::INTEGER_LITERAL:    return yy::parser::symbol_type (t, stoi(lexer.YYText()));
-            case yy::parser::token::FLOATING_LITERAL:   return yy::parser::symbol_type (t, stod(lexer.YYText()));
-            case yy::parser::token::STRING_LITERAL:     return yy::parser::symbol_type (t, lexer.YYText());
-            case yy::parser::token::IDENTIFIER:         return yy::parser::symbol_type (t, lexer.YYText());
-        }
-
-        return yy::parser::symbol_type (t);
+        static Lexer lexer;
+        return lexer.scan ();
     }
 
-#line 2400 "parser.cpp"
+    void yy::parser::error (const std::string& msg) {
+        cerr << msg;
+    }
+
+#line 2412 "parser.cpp"
 
 
 #ifndef YY_
@@ -2470,16 +2482,17 @@ switch (yykind)
 
 #line 5 "parser.y"
 namespace yy {
-#line 2474 "parser.cpp"
+#line 2486 "parser.cpp"
 
   /// Build a parser object.
   parser::parser ()
 #if YYDEBUG
     : yydebug_ (false),
-      yycdebug_ (&std::cerr)
+      yycdebug_ (&std::cerr),
 #else
-
+    :
 #endif
+      yy_lac_established_ (false)
   {}
 
   parser::~parser ()
@@ -2767,6 +2780,10 @@ namespace yy {
     /// The return value of parse ().
     int yyresult;
 
+    // Discard the LAC context in case there still is one left from a
+    // previous invocation.
+    yy_lac_discard_ ("init");
+
 #if YY_EXCEPTIONS
     try
 #endif // YY_EXCEPTIONS
@@ -2841,6 +2858,8 @@ namespace yy {
     yyn += yyla.kind ();
     if (yyn < 0 || yylast_ < yyn || yycheck_[yyn] != yyla.kind ())
       {
+        if (!yy_lac_establish_ (yyla.kind ()))
+          goto yyerrlab;
         goto yydefault;
       }
 
@@ -2850,6 +2869,9 @@ namespace yy {
       {
         if (yy_table_value_is_error_ (yyn))
           goto yyerrlab;
+        if (!yy_lac_establish_ (yyla.kind ()))
+          goto yyerrlab;
+
         yyn = -yyn;
         goto yyreduce;
       }
@@ -2860,6 +2882,7 @@ namespace yy {
 
     // Shift the lookahead token.
     yypush_ ("Shifting", state_type (yyn), YY_MOVE (yyla));
+    yy_lac_discard_ ("shift");
     goto yynewstate;
 
 
@@ -2913,14 +2936,14 @@ namespace yy {
         {
           switch (yyn)
             {
-  case 2: // program: classes mainClass classes
+  case 2: // program: classes mainClass classes YYEOF
 #line 117 "parser.y"
-                                   {cout << "Valid program!\n"; }
-#line 2920 "parser.cpp"
+                                         {cout << "Valid program!\n"; }
+#line 2943 "parser.cpp"
     break;
 
 
-#line 2924 "parser.cpp"
+#line 2947 "parser.cpp"
 
             default:
               break;
@@ -3028,6 +3051,7 @@ namespace yy {
 
 
       // Shift the error token.
+      yy_lac_discard_ ("error recovery");
       error_token.state = state_type (yyn);
       yypush_ ("Shifting", YY_MOVE (error_token));
     }
@@ -3094,50 +3118,25 @@ namespace yy {
     error (yyexc.what ());
   }
 
-  /* Return YYSTR after stripping away unnecessary quotes and
-     backslashes, so that it's suitable for yyerror.  The heuristic is
-     that double-quoting is unnecessary unless the string contains an
-     apostrophe, a comma, or backslash (other than backslash-backslash).
-     YYSTR is taken from yytname.  */
-  std::string
-  parser::yytnamerr_ (const char *yystr)
-  {
-    if (*yystr == '"')
-      {
-        std::string yyr;
-        char const *yyp = yystr;
-
-        for (;;)
-          switch (*++yyp)
-            {
-            case '\'':
-            case ',':
-              goto do_not_strip_quotes;
-
-            case '\\':
-              if (*++yyp != '\\')
-                goto do_not_strip_quotes;
-              else
-                goto append;
-
-            append:
-            default:
-              yyr += *yyp;
-              break;
-
-            case '"':
-              return yyr;
-            }
-      do_not_strip_quotes: ;
-      }
-
-    return yystr;
-  }
-
-  std::string
+  const char *
   parser::symbol_name (symbol_kind_type yysymbol)
   {
-    return yytnamerr_ (yytname_[yysymbol]);
+    static const char *const yy_sname[] =
+    {
+    "YYEOF", "error", "invalid token", "class", "Main", "main", "void",
+  "return", "public", "protected", "private", "{", "}", "(", ")", ".", ";",
+  ",", "UNKNOWN", "+", "-", "*", "/", "%", "++", "--", ">", "<", ">=",
+  "<=", "==", "!=", "||", "&&", "!", "|", "&", "^", "~", "<<", ">>", "=",
+  "+=", "-=", "*=", "/=", "%=", "&=", "|=", "^=", "<<=", ">>=",
+  "INTEGER_LITERAL", "FLOATING_LITERAL", "STRING_LITERAL", "IDENTIFIER",
+  "UMINUS", "UPLUS", "ADDRESS_OF", "DEREFERENCE", "PRE_INCREMENT",
+  "PRE_DECREMENT", "POST_INCREMENT", "POST_DECREMENT", "':'", "$accept",
+  "program", "mainClass", "classes", "classDef", "optionalSemicolons",
+  "accessSpecifiers", "functions", "function", "arguments", "argumentList",
+  "statements", "statement", "declaration", "init", "moreDeclarations",
+  "expression", YY_NULLPTR
+    };
+    return yy_sname[yysymbol];
   }
 
 
@@ -3154,29 +3153,28 @@ namespace yy {
     // Actual number of expected tokens
     int yycount = 0;
 
-    const int yyn = yypact_[+yyparser_.yystack_[0].state];
-    if (!yy_pact_value_is_default_ (yyn))
-      {
-        /* Start YYX at -YYN if negative to avoid negative indexes in
-           YYCHECK.  In other words, skip the first -YYN actions for
-           this state because they are default actions.  */
-        const int yyxbegin = yyn < 0 ? -yyn : 0;
-        // Stay within bounds of both yycheck and yytname.
-        const int yychecklim = yylast_ - yyn + 1;
-        const int yyxend = yychecklim < YYNTOKENS ? yychecklim : YYNTOKENS;
-        for (int yyx = yyxbegin; yyx < yyxend; ++yyx)
-          if (yycheck_[yyx + yyn] == yyx && yyx != symbol_kind::S_YYerror
-              && !yy_table_value_is_error_ (yytable_[yyx + yyn]))
-            {
-              if (!yyarg)
-                ++yycount;
-              else if (yycount == yyargn)
-                return 0;
-              else
-                yyarg[yycount++] = YY_CAST (symbol_kind_type, yyx);
-            }
-      }
+#if YYDEBUG
+    // Execute LAC once. We don't care if it is successful, we
+    // only do it for the sake of debugging output.
+    if (!yyparser_.yy_lac_established_)
+      yyparser_.yy_lac_check_ (yyla_.kind ());
+#endif
 
+    for (int yyx = 0; yyx < YYNTOKENS; ++yyx)
+      {
+        symbol_kind_type yysym = YY_CAST (symbol_kind_type, yyx);
+        if (yysym != symbol_kind::S_YYerror
+            && yysym != symbol_kind::S_YYUNDEF
+            && yyparser_.yy_lac_check_ (yysym))
+          {
+            if (!yyarg)
+              ++yycount;
+            else if (yycount == yyargn)
+              return 0;
+            else
+              yyarg[yycount++] = yysym;
+          }
+      }
     if (yyarg && yycount == 0 && 0 < yyargn)
       yyarg[0] = symbol_kind::S_YYEMPTY;
     return yycount;
@@ -3185,6 +3183,145 @@ namespace yy {
 
 
 
+  bool
+  parser::yy_lac_check_ (symbol_kind_type yytoken) const
+  {
+    // Logically, the yylac_stack's lifetime is confined to this function.
+    // Clear it, to get rid of potential left-overs from previous call.
+    yylac_stack_.clear ();
+    // Reduce until we encounter a shift and thereby accept the token.
+#if YYDEBUG
+    YYCDEBUG << "LAC: checking lookahead " << symbol_name (yytoken) << ':';
+#endif
+    std::ptrdiff_t lac_top = 0;
+    while (true)
+      {
+        state_type top_state = (yylac_stack_.empty ()
+                                ? yystack_[lac_top].state
+                                : yylac_stack_.back ());
+        int yyrule = yypact_[+top_state];
+        if (yy_pact_value_is_default_ (yyrule)
+            || (yyrule += yytoken) < 0 || yylast_ < yyrule
+            || yycheck_[yyrule] != yytoken)
+          {
+            // Use the default action.
+            yyrule = yydefact_[+top_state];
+            if (yyrule == 0)
+              {
+                YYCDEBUG << " Err\n";
+                return false;
+              }
+          }
+        else
+          {
+            // Use the action from yytable.
+            yyrule = yytable_[yyrule];
+            if (yy_table_value_is_error_ (yyrule))
+              {
+                YYCDEBUG << " Err\n";
+                return false;
+              }
+            if (0 < yyrule)
+              {
+                YYCDEBUG << " S" << yyrule << '\n';
+                return true;
+              }
+            yyrule = -yyrule;
+          }
+        // By now we know we have to simulate a reduce.
+        YYCDEBUG << " R" << yyrule - 1;
+        // Pop the corresponding number of values from the stack.
+        {
+          std::ptrdiff_t yylen = yyr2_[yyrule];
+          // First pop from the LAC stack as many tokens as possible.
+          std::ptrdiff_t lac_size = std::ptrdiff_t (yylac_stack_.size ());
+          if (yylen < lac_size)
+            {
+              yylac_stack_.resize (std::size_t (lac_size - yylen));
+              yylen = 0;
+            }
+          else if (lac_size)
+            {
+              yylac_stack_.clear ();
+              yylen -= lac_size;
+            }
+          // Only afterwards look at the main stack.
+          // We simulate popping elements by incrementing lac_top.
+          lac_top += yylen;
+        }
+        // Keep top_state in sync with the updated stack.
+        top_state = (yylac_stack_.empty ()
+                     ? yystack_[lac_top].state
+                     : yylac_stack_.back ());
+        // Push the resulting state of the reduction.
+        state_type state = yy_lr_goto_state_ (top_state, yyr1_[yyrule]);
+        YYCDEBUG << " G" << int (state);
+        yylac_stack_.push_back (state);
+      }
+  }
+
+  // Establish the initial context if no initial context currently exists.
+  bool
+  parser::yy_lac_establish_ (symbol_kind_type yytoken)
+  {
+    /* Establish the initial context for the current lookahead if no initial
+       context is currently established.
+
+       We define a context as a snapshot of the parser stacks.  We define
+       the initial context for a lookahead as the context in which the
+       parser initially examines that lookahead in order to select a
+       syntactic action.  Thus, if the lookahead eventually proves
+       syntactically unacceptable (possibly in a later context reached via a
+       series of reductions), the initial context can be used to determine
+       the exact set of tokens that would be syntactically acceptable in the
+       lookahead's place.  Moreover, it is the context after which any
+       further semantic actions would be erroneous because they would be
+       determined by a syntactically unacceptable token.
+
+       yy_lac_establish_ should be invoked when a reduction is about to be
+       performed in an inconsistent state (which, for the purposes of LAC,
+       includes consistent states that don't know they're consistent because
+       their default reductions have been disabled).
+
+       For parse.lac=full, the implementation of yy_lac_establish_ is as
+       follows.  If no initial context is currently established for the
+       current lookahead, then check if that lookahead can eventually be
+       shifted if syntactic actions continue from the current context.  */
+    if (yy_lac_established_)
+      return true;
+    else
+      {
+#if YYDEBUG
+        YYCDEBUG << "LAC: initial context established for "
+                 << symbol_name (yytoken) << '\n';
+#endif
+        yy_lac_established_ = true;
+        return yy_lac_check_ (yytoken);
+      }
+  }
+
+  // Discard any previous initial lookahead context.
+  void
+  parser::yy_lac_discard_ (const char* event)
+  {
+   /* Discard any previous initial lookahead context because of Event,
+      which may be a lookahead change or an invalidation of the currently
+      established initial context for the current lookahead.
+
+      The most common example of a lookahead change is a shift.  An example
+      of both cases is syntax error recovery.  That is, a syntax error
+      occurs when the lookahead is syntactically erroneous for the
+      currently established initial context, so error recovery manipulates
+      the parser stacks to try to find a new initial context in which the
+      current lookahead is syntactically acceptable.  If it fails to find
+      such a context, it discards the lookahead.  */
+    if (yy_lac_established_)
+      {
+        YYCDEBUG << "LAC: initial context discarded due to "
+                 << event << '\n';
+        yy_lac_established_ = false;
+      }
+  }
 
 
   int
@@ -3206,14 +3343,12 @@ namespace yy {
          been a previous inconsistent state, consistent state with a
          non-default action, or user semantic action that manipulated
          yyla.  (However, yyla is currently not documented for users.)
-       - Of course, the expected token list depends on states to have
-         correct lookahead information, and it depends on the parser not
-         to perform extra reductions after fetching a lookahead from the
-         scanner and before detecting a syntax error.  Thus, state merging
-         (from LALR or IELR) and default reductions corrupt the expected
-         token list.  However, the list is correct for canonical LR with
-         one exception: it will still contain any token that will not be
-         accepted due to an error action in a later state.
+         In the first two cases, it might appear that the current syntax
+         error should have been detected in the previous state when
+         yy_lac_check was invoked.  However, at that time, there might
+         have been a different syntax error that discarded a different
+         initial context during error recovery, leaving behind the
+         current lookahead.
     */
 
     if (!yyctx.lookahead ().empty ())
@@ -3268,129 +3403,129 @@ namespace yy {
   }
 
 
-  const signed char parser::yypact_ninf_ = -38;
+  const signed char parser::yypact_ninf_ = -41;
 
   const signed char parser::yytable_ninf_ = -1;
 
   const short
   parser::yypact_[] =
   {
-     -38,     1,     0,   -38,    12,   -38,   -38,    -3,    -1,    19,
-       9,   -38,    -8,    43,    84,    56,     6,     7,     8,   -38,
-      20,    62,   -38,   -38,   -38,    63,    23,   -38,    73,   -38,
-      85,   -38,    45,    61,    46,    88,    86,   123,    92,   143,
-     -38,   143,   143,    50,    54,    55,   143,    66,   143,   -38,
-     -38,   158,   -38,   -38,   218,   -38,   106,    67,   -38,   -18,
-     240,   -38,   196,   -38,   -38,   -38,   -38,   -38,   -38,   -38,
-     -38,   -38,   -38,   143,   143,   143,   143,   143,   143,   143,
-     143,   143,   143,   143,    87,   -38,   143,   143,   143,   143,
+     -41,     1,     0,   -41,    12,   -41,   -41,    -3,     3,    10,
+       6,   -41,   -41,   -40,    17,    84,    34,   -16,     8,    11,
+     -41,    21,    64,   -41,   -41,   -41,    63,    29,   -41,    87,
+     -41,    88,   -41,    45,    61,    47,    89,    92,   123,    93,
+     143,   -41,   143,   143,    49,    55,    62,   143,    66,   143,
+     -41,   -41,   158,   -41,   -41,   218,   -41,   111,    70,   -41,
+     -18,   240,   -41,   196,   -41,   -41,   -41,   -41,   -41,   -41,
+     -41,   -41,   -41,   -41,   143,   143,   143,   143,   143,   143,
+     143,   143,   143,   143,   143,    85,   -41,   143,   143,   143,
      143,   143,   143,   143,   143,   143,   143,   143,   143,   143,
-     143,   143,   143,   143,   -38,    70,   -38,    63,   -38,   262,
+     143,   143,   143,   143,   143,   -41,    72,   -41,    63,   -41,
      262,   262,   262,   262,   262,   262,   262,   262,   262,   262,
-     143,   -38,    -9,    -9,   -38,   -38,   -38,    68,    68,    68,
-      68,   387,   387,   284,   306,   328,   372,   350,    -2,    -2,
-      99,   -38,   262,    18,   -38,   -38,    71,    87,   -38
+     262,   143,   -41,    48,    48,   -41,   -41,   -41,    68,    68,
+      68,    68,   387,   387,   284,   306,   328,   372,   350,    -2,
+      -2,    99,   -41,   262,    18,   -41,   -41,    73,    85,   -41
   };
 
   const signed char
   parser::yydefact_[] =
   {
-       5,     0,     0,     1,     0,     5,     4,     0,     0,     2,
-       0,    14,     0,     0,    12,     0,     0,     0,     0,     8,
-       0,     0,     9,    11,    10,     6,     0,    13,     0,     7,
-       0,    21,    17,     0,     0,     0,    16,     0,     0,     0,
-      26,     0,     0,     0,     0,     0,     0,     0,     0,    73,
-      74,    72,    20,    22,     0,    18,     0,     0,    25,    72,
-       0,     8,     0,    50,    51,    54,    56,    57,    52,    55,
-      53,    58,    59,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,    29,    23,     0,     0,     0,     0,
+       5,     0,     0,     1,     0,     5,     4,     0,     0,     0,
+       0,    14,     2,     0,     0,    12,     0,     0,     0,     0,
+       8,     0,     0,     9,    11,    10,     6,     0,    13,     0,
+       7,     0,    21,    17,     0,     0,     0,    16,     0,     0,
+       0,    26,     0,     0,     0,     0,     0,     0,     0,     0,
+      73,    74,    72,    20,    22,     0,    18,     0,     0,    25,
+      72,     0,     8,     0,    50,    51,    54,    56,    57,    52,
+      55,    53,    58,    59,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,    29,    23,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,    21,     0,    24,     3,    71,    60,
-      61,    62,    63,    64,    65,    66,    67,    68,    69,    70,
-       0,    31,    32,    33,    34,    35,    36,    39,    40,    46,
-      47,    48,    49,    44,    45,    37,    38,    41,    42,    43,
-       0,    19,    28,     0,    15,    27,     0,    29,    30
+       0,     0,     0,     0,     0,    21,     0,    24,     3,    71,
+      60,    61,    62,    63,    64,    65,    66,    67,    68,    69,
+      70,     0,    31,    32,    33,    34,    35,    36,    39,    40,
+      46,    47,    48,    49,    44,    45,    37,    38,    41,    42,
+      43,     0,    19,    28,     0,    15,    27,     0,    29,    30
   };
 
   const signed char
   parser::yypgoto_[] =
   {
-     -38,   -38,   -38,   122,   -38,    69,   -38,   -38,   -38,   -38,
-     -38,    25,   -38,   -38,   -16,   -38,   -37
+     -41,   -41,   -41,   124,   -41,    69,   -41,   -41,   -41,   -41,
+     -41,    25,   -41,   -41,   -14,   -41,   -38
   };
 
   const unsigned char
   parser::yydefgoto_[] =
   {
-       0,     1,     5,     2,     6,    25,    20,    14,    27,    35,
-      36,    33,    52,    53,   121,   143,    54
+       0,     1,     5,     2,     6,    26,    21,    15,    28,    36,
+      37,    34,    53,    54,   122,   144,    55
   };
 
   const unsigned char
   parser::yytable_[] =
   {
-      60,     3,    62,     4,    63,    64,    71,    72,    10,    68,
-      11,    70,    88,    89,    90,    13,     7,    86,    87,    88,
-      89,    90,    12,    73,    74,    75,    76,    77,    78,    79,
-      80,    81,    82,    83,   145,   146,   109,   110,   111,   112,
-     113,   114,   115,   116,   117,   118,   119,     8,    15,   122,
-     123,   124,   125,   126,   127,   128,   129,   130,   131,   132,
-     133,   134,   135,   136,   137,   138,   139,     8,    37,    21,
-      22,    23,    24,    38,    39,    26,    28,    40,    30,    29,
-      41,    42,    43,   142,    31,    44,    45,    86,    87,    88,
-      89,    90,    16,    17,    18,    46,    19,    47,    32,    48,
-      34,    55,    56,    57,    61,    65,    37,   102,   103,    66,
-      67,   144,    39,    49,    50,    40,    51,   104,    41,    42,
-      43,    69,   105,    44,    45,   141,   147,     9,   120,   140,
-     107,   148,     0,    46,     0,    47,    39,    48,     0,    58,
-       0,     0,    41,    42,    43,     0,     0,    44,    45,     0,
-       0,    49,    50,     0,    51,     0,    39,    46,     0,    47,
-       0,    48,    41,    42,    43,     0,     0,    44,    45,     0,
-       0,     0,     0,     0,     0,    49,    50,    46,    59,    47,
-       0,    48,    71,    72,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,    49,    50,     0,    59,    73,
-      74,    75,    76,    77,    78,    79,    80,    81,    82,    83,
-     108,     0,     0,    84,     0,    86,    87,    88,    89,    90,
-       0,     0,    91,    92,    93,    94,    95,    96,    97,    98,
-       0,    99,   100,   101,    85,   102,   103,    86,    87,    88,
-      89,    90,     0,     0,    91,    92,    93,    94,    95,    96,
-      97,    98,     0,    99,   100,   101,   106,   102,   103,    86,
-      87,    88,    89,    90,     0,     0,    91,    92,    93,    94,
-      95,    96,    97,    98,     0,    99,   100,   101,     0,   102,
-     103,    86,    87,    88,    89,    90,     0,     0,    91,    92,
-      93,    94,    95,    96,    97,    98,     0,    99,   100,   101,
-       0,   102,   103,    86,    87,    88,    89,    90,     0,     0,
-      91,    92,    93,    94,    95,    96,     0,    98,     0,    99,
-     100,   101,     0,   102,   103,    86,    87,    88,    89,    90,
-       0,     0,    91,    92,    93,    94,    95,    96,     0,     0,
-       0,    99,   100,   101,     0,   102,   103,    86,    87,    88,
-      89,    90,     0,     0,    91,    92,    93,    94,    95,    96,
-       0,     0,     0,     0,   100,   101,     0,   102,   103,    86,
-      87,    88,    89,    90,     0,     0,    91,    92,    93,    94,
-      95,    96,     0,     0,     0,     0,   100,     0,     0,   102,
-     103,    86,    87,    88,    89,    90,     0,     0,    91,    92,
-      93,    94,    95,    96,     0,     0,    86,    87,    88,    89,
-      90,   102,   103,    91,    92,    93,    94,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,   102,   103
+      61,     3,    63,     4,    64,    65,    72,    73,    10,    69,
+      12,    71,    14,    13,    11,     8,     7,    87,    88,    89,
+      90,    91,    16,    74,    75,    76,    77,    78,    79,    80,
+      81,    82,    83,    84,   146,   147,   110,   111,   112,   113,
+     114,   115,   116,   117,   118,   119,   120,    22,    23,   123,
+     124,   125,   126,   127,   128,   129,   130,   131,   132,   133,
+     134,   135,   136,   137,   138,   139,   140,     8,    38,    89,
+      90,    91,    24,    39,    40,    25,    27,    41,    29,    30,
+      42,    43,    44,   143,    31,    45,    46,    87,    88,    89,
+      90,    91,    17,    18,    19,    47,    20,    48,    32,    49,
+      35,    33,    56,    57,    66,    62,    38,   103,   104,    58,
+      67,   145,    40,    50,    51,    41,    52,    68,    42,    43,
+      44,    70,   105,    45,    46,   106,   121,   142,   148,     9,
+     141,   108,     0,    47,   149,    48,    40,    49,     0,    59,
+       0,     0,    42,    43,    44,     0,     0,    45,    46,     0,
+       0,    50,    51,     0,    52,     0,    40,    47,     0,    48,
+       0,    49,    42,    43,    44,     0,     0,    45,    46,     0,
+       0,     0,     0,     0,     0,    50,    51,    47,    60,    48,
+       0,    49,    72,    73,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,    50,    51,     0,    60,    74,
+      75,    76,    77,    78,    79,    80,    81,    82,    83,    84,
+     109,     0,     0,    85,     0,    87,    88,    89,    90,    91,
+       0,     0,    92,    93,    94,    95,    96,    97,    98,    99,
+       0,   100,   101,   102,    86,   103,   104,    87,    88,    89,
+      90,    91,     0,     0,    92,    93,    94,    95,    96,    97,
+      98,    99,     0,   100,   101,   102,   107,   103,   104,    87,
+      88,    89,    90,    91,     0,     0,    92,    93,    94,    95,
+      96,    97,    98,    99,     0,   100,   101,   102,     0,   103,
+     104,    87,    88,    89,    90,    91,     0,     0,    92,    93,
+      94,    95,    96,    97,    98,    99,     0,   100,   101,   102,
+       0,   103,   104,    87,    88,    89,    90,    91,     0,     0,
+      92,    93,    94,    95,    96,    97,     0,    99,     0,   100,
+     101,   102,     0,   103,   104,    87,    88,    89,    90,    91,
+       0,     0,    92,    93,    94,    95,    96,    97,     0,     0,
+       0,   100,   101,   102,     0,   103,   104,    87,    88,    89,
+      90,    91,     0,     0,    92,    93,    94,    95,    96,    97,
+       0,     0,     0,     0,   101,   102,     0,   103,   104,    87,
+      88,    89,    90,    91,     0,     0,    92,    93,    94,    95,
+      96,    97,     0,     0,     0,     0,   101,     0,     0,   103,
+     104,    87,    88,    89,    90,    91,     0,     0,    92,    93,
+      94,    95,    96,    97,     0,     0,    87,    88,    89,    90,
+      91,   103,   104,    92,    93,    94,    95,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,   103,   104
   };
 
   const short
   parser::yycheck_[] =
   {
-      37,     0,    39,     3,    41,    42,    24,    25,    11,    46,
-      11,    48,    21,    22,    23,     6,     4,    19,    20,    21,
-      22,    23,     3,    41,    42,    43,    44,    45,    46,    47,
-      48,    49,    50,    51,    16,    17,    73,    74,    75,    76,
-      77,    78,    79,    80,    81,    82,    83,    55,     5,    86,
-      87,    88,    89,    90,    91,    92,    93,    94,    95,    96,
-      97,    98,    99,   100,   101,   102,   103,    55,     7,    13,
-      64,    64,    64,    12,    13,    55,    14,    16,    55,    16,
-      19,    20,    21,   120,    11,    24,    25,    19,    20,    21,
-      22,    23,     8,     9,    10,    34,    12,    36,    13,    38,
-      55,    55,    14,    17,    12,    55,     7,    39,    40,    55,
-      55,    12,    13,    52,    53,    16,    55,    11,    19,    20,
-      21,    55,    55,    24,    25,    55,    55,     5,    41,   104,
-      61,   147,    -1,    34,    -1,    36,    13,    38,    -1,    16,
+      38,     0,    40,     3,    42,    43,    24,    25,    11,    47,
+       0,    49,     6,     3,    11,    55,     4,    19,    20,    21,
+      22,    23,     5,    41,    42,    43,    44,    45,    46,    47,
+      48,    49,    50,    51,    16,    17,    74,    75,    76,    77,
+      78,    79,    80,    81,    82,    83,    84,    13,    64,    87,
+      88,    89,    90,    91,    92,    93,    94,    95,    96,    97,
+      98,    99,   100,   101,   102,   103,   104,    55,     7,    21,
+      22,    23,    64,    12,    13,    64,    55,    16,    14,    16,
+      19,    20,    21,   121,    55,    24,    25,    19,    20,    21,
+      22,    23,     8,     9,    10,    34,    12,    36,    11,    38,
+      55,    13,    55,    14,    55,    12,     7,    39,    40,    17,
+      55,    12,    13,    52,    53,    16,    55,    55,    19,    20,
+      21,    55,    11,    24,    25,    55,    41,    55,    55,     5,
+     105,    62,    -1,    34,   148,    36,    13,    38,    -1,    16,
       -1,    -1,    19,    20,    21,    -1,    -1,    24,    25,    -1,
       -1,    52,    53,    -1,    55,    -1,    13,    34,    -1,    36,
       -1,    38,    19,    20,    21,    -1,    -1,    24,    25,    -1,
@@ -3426,20 +3561,20 @@ namespace yy {
   parser::yystos_[] =
   {
        0,    66,    68,     0,     3,    67,    69,     4,    55,    68,
-      11,    11,     3,     6,    72,     5,     8,     9,    10,    12,
-      71,    13,    64,    64,    64,    70,    55,    73,    14,    16,
-      55,    11,    13,    76,    55,    74,    75,     7,    12,    13,
-      16,    19,    20,    21,    24,    25,    34,    36,    38,    52,
-      53,    55,    77,    78,    81,    55,    14,    17,    16,    55,
-      81,    12,    81,    81,    81,    55,    55,    55,    81,    55,
-      81,    24,    25,    41,    42,    43,    44,    45,    46,    47,
-      48,    49,    50,    51,    55,    16,    19,    20,    21,    22,
-      23,    26,    27,    28,    29,    30,    31,    32,    33,    35,
-      36,    37,    39,    40,    11,    55,    16,    70,    14,    81,
+      11,    11,     0,     3,     6,    72,     5,     8,     9,    10,
+      12,    71,    13,    64,    64,    64,    70,    55,    73,    14,
+      16,    55,    11,    13,    76,    55,    74,    75,     7,    12,
+      13,    16,    19,    20,    21,    24,    25,    34,    36,    38,
+      52,    53,    55,    77,    78,    81,    55,    14,    17,    16,
+      55,    81,    12,    81,    81,    81,    55,    55,    55,    81,
+      55,    81,    24,    25,    41,    42,    43,    44,    45,    46,
+      47,    48,    49,    50,    51,    55,    16,    19,    20,    21,
+      22,    23,    26,    27,    28,    29,    30,    31,    32,    33,
+      35,    36,    37,    39,    40,    11,    55,    16,    70,    14,
       81,    81,    81,    81,    81,    81,    81,    81,    81,    81,
-      41,    79,    81,    81,    81,    81,    81,    81,    81,    81,
+      81,    41,    79,    81,    81,    81,    81,    81,    81,    81,
       81,    81,    81,    81,    81,    81,    81,    81,    81,    81,
-      76,    55,    81,    80,    12,    16,    17,    55,    79
+      81,    76,    55,    81,    80,    12,    16,    17,    55,    79
   };
 
   const signed char
@@ -3458,7 +3593,7 @@ namespace yy {
   const signed char
   parser::yyr2_[] =
   {
-       0,     2,     3,    12,     2,     0,     6,     2,     0,     2,
+       0,     2,     4,    12,     2,     0,     6,     2,     0,     2,
        2,     2,     0,     3,     0,     8,     1,     0,     2,     4,
        2,     0,     1,     2,     3,     2,     1,     5,     2,     0,
        4,     0,     3,     3,     3,     3,     3,     3,     3,     3,
@@ -3469,29 +3604,6 @@ namespace yy {
   };
 
 
-#if YYDEBUG || 1
-  // YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
-  // First, the terminals, then, starting at \a YYNTOKENS, nonterminals.
-  const char*
-  const parser::yytname_[] =
-  {
-  "\"end of file\"", "error", "\"invalid token\"", "\"class\"",
-  "\"Main\"", "\"main\"", "\"void\"", "\"return\"", "\"public\"",
-  "\"protected\"", "\"private\"", "\"{\"", "\"}\"", "\"(\"", "\")\"",
-  "\".\"", "\";\"", "\",\"", "UNKNOWN", "\"+\"", "\"-\"", "\"*\"", "\"/\"",
-  "\"%\"", "\"++\"", "\"--\"", "\">\"", "\"<\"", "\">=\"", "\"<=\"",
-  "\"==\"", "\"!=\"", "\"||\"", "\"&&\"", "\"!\"", "\"|\"", "\"&\"",
-  "\"^\"", "\"~\"", "\"<<\"", "\">>\"", "\"=\"", "\"+=\"", "\"-=\"",
-  "\"*=\"", "\"/=\"", "\"%=\"", "\"&=\"", "\"|=\"", "\"^=\"", "\"<<=\"",
-  "\">>=\"", "INTEGER_LITERAL", "FLOATING_LITERAL", "STRING_LITERAL",
-  "IDENTIFIER", "UMINUS", "UPLUS", "ADDRESS_OF", "DEREFERENCE",
-  "PRE_INCREMENT", "PRE_DECREMENT", "POST_INCREMENT", "POST_DECREMENT",
-  "':'", "$accept", "program", "mainClass", "classes", "classDef",
-  "optionalSemicolons", "accessSpecifiers", "functions", "function",
-  "arguments", "argumentList", "statements", "statement", "declaration",
-  "init", "moreDeclarations", "expression", YY_NULLPTR
-  };
-#endif
 
 
 #if YYDEBUG
@@ -3538,14 +3650,10 @@ namespace yy {
 
 #line 5 "parser.y"
 } // yy
-#line 3542 "parser.cpp"
+#line 3654 "parser.cpp"
 
 #line 221 "parser.y"
 
-
-void yy::parser::error(const std::string& msg) {
-    cerr << msg << ";";
-}
 
 int main () {
 
