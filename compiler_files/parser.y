@@ -8,28 +8,47 @@
 %define api.value.type variant
 %define parse.error detailed
 %define parse.lac full
+%locations
+%define api.location.file "location.hpp"
+
+%parse-param {ifstream& fin} {string* filename}
+%lex-param   {ifstream& fin} {string* filename}
 
 %code requires {
     #include <iostream>
     #include <string>
+    #include <fstream>
     #include <variant>
 
     using namespace std;
 }
 
 %code {
+
     class Lexer: public yyFlexLexer {
     public:
+        yy::location yylloc;
+
+        Lexer (ifstream& fin, string* fname) : yyFlexLexer (fin, cout) {
+            yylloc.initialize (fname, 1, 1);
+        }
+
+        void update_loc () {
+            yylloc.step ();
+            yylloc.end.column += yyleng;
+            cout << yytext << '\t' << yylloc << '\n';
+        }
+
         yy::parser::symbol_type scan ();
     };
 
-    yy::parser::symbol_type yylex () {
-        static Lexer lexer;
+    yy::parser::symbol_type yylex (ifstream& fin, string* filename) {
+        static Lexer lexer (fin, filename);
         return lexer.scan ();
     }
 
-    void yy::parser::error (const std::string& msg) {
-        cerr << msg;
+    void yy::parser::error (const location& loc, const std::string& msg) {
+        cerr << loc << msg;
     }
 }
 
@@ -222,7 +241,10 @@ expression: expression "+" expression
 
 int main () {
 
-    yy::parser p;
+    string filename ("file.anial");
+    ifstream fin ("file.anial");
+
+    yy::parser p(fin, &filename);
     p.parse ();
 
     return 0;
