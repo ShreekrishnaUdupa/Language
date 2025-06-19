@@ -1,5 +1,5 @@
 %option c++
-%option noyywrap
+%option noyywrap noinput nounput batch debug
 
 %{
 #include <iostream>
@@ -18,13 +18,12 @@ int yyFlexLexer::yylex () {
 
 %%
 "class"         { update_loc (); return parser::make_CLASS (yylloc); }
-"Main"          { update_loc (); return parser::make_TOKEN_Main (yylloc); }
-"main"          { update_loc (); return parser::make_TOKEN_main (yylloc); }
-"void"          { update_loc (); return parser::make_VOID (yylloc); }
 "return"        { update_loc (); return parser::make_RETURN (yylloc); }
 "public"        { update_loc (); return parser::make_PUBLIC (yylloc); }
 "private"       { update_loc (); return parser::make_PRIVATE (yylloc); }
 "protected"     { update_loc (); return parser::make_PROTECTED (yylloc); }
+"constructor"   { update_loc (); return parser::make_CONSTRUCTOR (yylloc); }
+"destructor"    { update_loc (); return parser::make_DESTRUCTOR (yylloc); }
 
 "++"            { update_loc (); return parser::make_INCREMENT (yylloc); }
 "--"            { update_loc (); return parser::make_DECREMENT (yylloc); }
@@ -47,11 +46,11 @@ int yyFlexLexer::yylex () {
 "<<"            { update_loc (); return parser::make_LEFT_SHIFT (yylloc); }
 ">>"            { update_loc (); return parser::make_RIGHT_SHIFT (yylloc); }
 
-[+-]?([0-9]+\.[0-9]+|\.[0-9]+)([eE][+-]?[0-9]+)?   { update_loc (); return parser::make_FLOATING_LITERAL (stod(yytext), yylloc); }
-[+-]?[0-9]+([eE][+-]?[0-9]+)?                       { update_loc (); return parser::make_INTEGER_LITERAL  (stoi(yytext), yylloc); }
-
-[a-zA-Z_][a-zA-Z0-9_]*                              { update_loc (); return parser::make_IDENTIFIER     (yytext, yylloc); }
-\"([^"\\]|\\.)*\"                                   { update_loc (); return parser::make_STRING_LITERAL (yytext, yylloc); }
+[+-]?([0-9]+\.[0-9]*|[0-9]*\.[0-9]+)([eE][+-]?[0-9]+)?  { update_loc (); return parser::make_FLOATING_LITERAL (stod(yytext), yylloc); }
+[+-]?[0-9]+([eE][+-]?[0-9]+)?                           { update_loc (); return parser::make_INTEGER_LITERAL  (stoi(yytext), yylloc); }
+`
+[a-zA-Z_][a-zA-Z0-9_]*                                  { update_loc (); return parser::make_IDENTIFIER     (yytext, yylloc); }
+\"([^"\\]|\\.)*\"                                       { update_loc (); return parser::make_STRING_LITERAL (yytext, yylloc); }
 
 "\n"            { yylloc.begin.line = ++yylloc.end.line; yylloc.begin.column = yylloc.end.column = 1; }
 [ \t]           { update_loc (); }
@@ -90,6 +89,7 @@ int yyFlexLexer::yylex () {
 ";"             { update_loc (); return parser::make_SEMICOLON (yylloc); }
 ","             { update_loc (); return parser::make_COMMA (yylloc); }
 "."             { update_loc (); return parser::make_DOT (yylloc); }
+":"             { update_loc (); return parser::make_COLON (yylloc); }
 
 .               { update_loc (); return parser::make_UNKNOWN (yylloc); }
 <<EOF>>         { update_loc (); return parser::make_YYEOF (yylloc); }

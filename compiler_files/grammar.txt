@@ -1,0 +1,129 @@
+program: classes mainClass classes YYEOF {cout << "Valid program!\n"; }
+       ;
+
+mainClass: "class" "Main" "{" "void" "main" "(" ")" "{" statements "}" "}" optionalSemicolons
+         ;
+
+classes: classes classDef
+       | %empty
+       ;
+
+classDef: "class" IDENTIFIER "{" functions "}" optionalSemicolons
+        ;
+
+optionalSemicolons: optionalSemicolons ";"
+                  | %empty
+                  ;
+
+accessSpecifiers: "public" ":"
+                | "private" ":"
+                | "protected" ":"
+                | %empty
+                ;
+
+functions: functions accessSpecifiers function
+         | %empty
+         ;
+
+function: IDENTIFIER IDENTIFIER "(" parameters ")" "{" statements "}"
+        | constructorDef
+        | destructorDef
+        ;
+
+parameters: parametersList
+		  | %empty
+		  ;
+
+parametersList: IDENTIFIER IDENTIFIER
+			  | parametersList "," IDENTIFIER IDENTIFIER
+			  ;
+
+constructorDef: "constructor" "(" parameters ")" "{" statements "}"
+
+destructorDef: "destructor" "(" ")" "{" statements "}"
+
+declarations: IDENTIFIER IDENTIFIER init moreDeclarations ";"
+           ;
+
+init: "=" expression
+    | %empty
+    ;
+
+moreDeclarations: moreDeclarations "," IDENTIFIER init
+                | %empty
+                ;
+
+functionCall: IDENTIFIER "(" arguments ")" ";"
+
+arguments: argumentsList
+         | %empty
+         ;
+
+argumentsList: argumentsList "," expression
+             | expression
+             ;
+
+statements: statements statement
+          | %empty
+          ;   
+
+statement: declarations
+         | functionCall
+         | expression ";"
+         | "return" expression ";"
+         | "return" ";"
+         | optionalSemicolons
+         ;
+
+expression: expression "+" expression
+          | expression "-" expression
+          | expression "*" expression
+          | expression "/" expression
+          | expression "%" expression
+          | expression "|" expression
+          | expression "&" expression
+          | expression ">" expression
+          | expression "<" expression
+          | expression "^" expression
+          | expression "<<" expression
+          | expression ">>" expression
+          | expression "||" expression
+          | expression "&&" expression
+          | expression ">=" expression
+          | expression "<=" expression
+          | expression "==" expression
+          | expression "!=" expression
+          | "+" expression %prec UPLUS
+          | "-" expression %prec UMINUS
+          | "!" expression
+          | "~" expression
+          | "*" IDENTIFIER %prec DEREFERENCE
+          | "&" IDENTIFIER %prec ADDRESS_OF
+          | "++" IDENTIFIER %prec PRE_INCREMENT
+          | "--" IDENTIFIER %prec PRE_DECREMENT
+          | IDENTIFIER "++" %prec POST_INCREMENT
+          | IDENTIFIER "--" %prec POST_DECREMENT
+          | IDENTIFIER "=" expression
+          | IDENTIFIER "+=" expression
+          | IDENTIFIER "-=" expression
+          | IDENTIFIER "*=" expression
+          | IDENTIFIER "/=" expression
+          | IDENTIFIER "%=" expression
+          | IDENTIFIER "&=" expression
+          | IDENTIFIER "|=" expression
+          | IDENTIFIER "^=" expression
+          | IDENTIFIER "<<=" expression
+          | IDENTIFIER ">>=" expression
+          | "(" expression ")"
+          | IDENTIFIER
+          | INTEGER_LITERAL
+          | FLOATING_LITERAL
+          ;
+
+// Comma Expression:
+
+commaExpression: commaExpression "," expression
+               | expression "," expression
+               ;
+
+               

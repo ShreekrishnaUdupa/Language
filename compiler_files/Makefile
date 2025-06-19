@@ -1,8 +1,7 @@
 all:
-	make clean;
-	bison -dtv -o parser.cpp parser.y;
+	bison -tv -o parser.cpp parser.y;
 	flex -o lexer.cpp lexer.l;
-	g++ -O3 -I . -o anial lexer.cpp
+	clang++ -I . -O3 -o anial lexer.cpp
 
 test:
 	./anial

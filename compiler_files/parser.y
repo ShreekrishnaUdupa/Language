@@ -18,7 +18,6 @@
     #include <iostream>
     #include <string>
     #include <fstream>
-    #include <variant>
 
     using namespace std;
 }
@@ -36,7 +35,6 @@
         void update_loc () {
             yylloc.step ();
             yylloc.end.column += yyleng;
-            cout << yytext << '\t' << yylloc << '\n';
         }
 
         yy::parser::symbol_type scan ();
@@ -44,27 +42,28 @@
 
     yy::parser::symbol_type yylex (ifstream& fin, string* filename) {
         static Lexer lexer (fin, filename);
+        // lexer.set_debug (1);
         return lexer.scan ();
     }
 
     void yy::parser::error (const location& loc, const std::string& msg) {
-        cerr << loc << msg;
+        cerr << loc << " " << msg;
     }
 }
 
 %token CLASS "class"
-%token TOKEN_Main "Main"
-%token TOKEN_main "main"
-%token VOID "void"
 %token RETURN "return"
 %token PUBLIC "public"
 %token PROTECTED "protected"
 %token PRIVATE "private"
+%token CONSTRUCTOR "constructor"
+%token DESTRUCTOR "destructor"
 %token LBRACE "{"
 %token RBRACE "}"
 %token LPAREN "("
 %token RPAREN ")"
 %token DOT "."
+%token COLON ":"
 
 %token SEMICOLON ";"
 %token COMMA ","
@@ -133,11 +132,8 @@
 %start program
 
 %%
-program: classes mainClass classes YYEOF {cout << "Valid program!\n"; }
+program: classes YYEOF {cout << "Valid program!\n"; }
        ;
-
-mainClass: "class" "Main" "{" "void" "main" "(" ")" "{" statements "}" "}" optionalSemicolons
-         ;
 
 classes: classes classDef
        | %empty
@@ -146,52 +142,70 @@ classes: classes classDef
 classDef: "class" IDENTIFIER "{" functions "}" optionalSemicolons
         ;
 
+
 optionalSemicolons: optionalSemicolons ";"
                   | %empty
                   ;
 
-accessSpecifiers: "public" ':'
-                | "private" ':'
-                | "protected" ':'
+accessSpecifiers: "public" ":"
+                | "private" ":"
+                | "protected" ":"
                 | %empty
                 ;
 
-functions: functions accessSpecifiers function
+functions: functions accessSpecifiers function optionalSemicolons
          | %empty
          ;
 
-function: IDENTIFIER IDENTIFIER "(" arguments ")" "{" statements "}"
+function: IDENTIFIER IDENTIFIER "(" parameters ")" "{" statements "}"
+        | constructorDef
+        | destructorDef
         ;
 
-arguments: argumentList
-         | %empty
-         ;
+parameters: parametersList
+		  | %empty
+		  ;
 
-argumentList: IDENTIFIER IDENTIFIER
-            | argumentList "," IDENTIFIER IDENTIFIER
-            ;
+parametersList: IDENTIFIER IDENTIFIER
+			  | parametersList "," IDENTIFIER IDENTIFIER
+			  ;
 
-statements: statements statement
-          | %empty
-          ;   
+constructorDef: "constructor" "(" parameters ")" "{" statements "}"
 
-statement: declaration
-         | expression ";"
-         | "return" expression ";"
-         | "return" ";"
-         | ";"
-         ;
+destructorDef: "destructor" "(" ")" "{" statements "}"
 
-declaration: IDENTIFIER IDENTIFIER init moreDeclarations ";"
+variableDeclarations: IDENTIFIER IDENTIFIER init moreVariableDeclarations ";"
            ;
 
 init: "=" expression
     | %empty
     ;
 
-moreDeclarations: moreDeclarations "," IDENTIFIER init
+moreVariableDeclarations: moreVariableDeclarations "," IDENTIFIER init
                 | %empty
                 ;
+
+functionCall: IDENTIFIER "(" arguments ")" ";"
+
+arguments: argumentsList
+         | %empty
+         ;
+
+argumentsList: argumentsList "," expression
+             | expression
+             ;
+        
+statements: statements statement
+          | %empty
+          ;
+
+statement: variableDeclarations
+         | functionCall
+         | expression ";"
+         | "return" expression ";"
+         | "return" ";"
+         | ";"
+         ;
 
 expression: expression "+" expression
           | expression "-" expression
@@ -236,6 +250,7 @@ expression: expression "+" expression
           | IDENTIFIER
           | INTEGER_LITERAL
           | FLOATING_LITERAL
+          | STRING_LITERAL
           ;
 %%
 
