@@ -2,6 +2,8 @@
 %option noyywrap noinput nounput batch debug
 
 %{
+#undef SIZE_MAX
+
 #include <iostream>
 #include <string>
 #include "parser.cpp"
@@ -24,6 +26,8 @@ int yyFlexLexer::yylex () {
 "protected"     { update_loc (); return parser::make_PROTECTED (yylloc); }
 "constructor"   { update_loc (); return parser::make_CONSTRUCTOR (yylloc); }
 "destructor"    { update_loc (); return parser::make_DESTRUCTOR (yylloc); }
+"if"            { update_loc (); return parser::make_IF (yylloc); }
+"else"          { update_loc (); return parser::make_ELSE (yylloc); }
 
 "++"            { update_loc (); return parser::make_INCREMENT (yylloc); }
 "--"            { update_loc (); return parser::make_DECREMENT (yylloc); }
@@ -46,8 +50,8 @@ int yyFlexLexer::yylex () {
 "<<"            { update_loc (); return parser::make_LEFT_SHIFT (yylloc); }
 ">>"            { update_loc (); return parser::make_RIGHT_SHIFT (yylloc); }
 
-[+-]?([0-9]+\.[0-9]*|[0-9]*\.[0-9]+)([eE][+-]?[0-9]+)?  { update_loc (); return parser::make_FLOATING_LITERAL (stod(yytext), yylloc); }
-[+-]?[0-9]+([eE][+-]?[0-9]+)?                           { update_loc (); return parser::make_INTEGER_LITERAL  (stoi(yytext), yylloc); }
+[+-]?([0-9]+\.[0-9]*|[0-9]*\.[0-9]+)([eE][+-]?[0-9]+)?  { update_loc (); return parser::make_FLOATING_LITERAL (stold (yytext), yylloc); }
+[+-]?[0-9]+([eE][+-]?[0-9]+)?                           { update_loc (); return parser::make_INTEGER_LITERAL  (stoll (yytext), yylloc); }
 `
 [a-zA-Z_][a-zA-Z0-9_]*                                  { update_loc (); return parser::make_IDENTIFIER     (yytext, yylloc); }
 \"([^"\\]|\\.)*\"                                       { update_loc (); return parser::make_STRING_LITERAL (yytext, yylloc); }

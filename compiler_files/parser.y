@@ -18,6 +18,7 @@
     #include <iostream>
     #include <string>
     #include <fstream>
+    #include "ast.hpp"
 
     using namespace std;
 }
@@ -58,6 +59,8 @@
 %token PRIVATE "private"
 %token CONSTRUCTOR "constructor"
 %token DESTRUCTOR "destructor"
+%token IF "if"
+%token ELSE "else"
 %token LBRACE "{"
 %token RBRACE "}"
 %token LPAREN "("
@@ -106,10 +109,9 @@
 %token BIT_XOR_ASSIGNMENT "^="
 %token LEFT_SHIFT_ASSIGNMENT "<<="
 %token RIGHT_SHIFT_ASSIGNMENT ">>="
-%token YYEOF 0
 
-%token <int> INTEGER_LITERAL
-%token <double> FLOATING_LITERAL
+%token <long long int> INTEGER_LITERAL
+%token <long double> FLOATING_LITERAL
 %token <string> STRING_LITERAL
 %token <string> IDENTIFIER
 
@@ -132,7 +134,7 @@
 %start program
 
 %%
-program: classes YYEOF {cout << "Valid program!\n"; }
+program: classes {cout << "Valid program!\n"; }
        ;
 
 classes: classes classDef
@@ -185,7 +187,7 @@ moreVariableDeclarations: moreVariableDeclarations "," IDENTIFIER init
                 | %empty
                 ;
 
-functionCall: IDENTIFIER "(" arguments ")" ";"
+functionCall: IDENTIFIER "(" arguments ")"
 
 arguments: argumentsList
          | %empty
@@ -194,13 +196,26 @@ arguments: argumentsList
 argumentsList: argumentsList "," expression
              | expression
              ;
+
+ifStatement: "if" "(" expression ")" "{" statements "}"
+
+ifElseStatement: ifStatement elseIfStatement elseStatement
+               ;
+
+elseIfStatement: elseIfStatement "else" ifStatement
+               | %empty
+               ;
+
+elseStatement: "else" "(" expression ")" "{" statements "}"
+             ;
         
 statements: statements statement
           | %empty
           ;
 
 statement: variableDeclarations
-         | functionCall
+         | ifStatement
+         | ifElseStatement
          | expression ";"
          | "return" expression ";"
          | "return" ";"
@@ -225,16 +240,6 @@ expression: expression "+" expression
           | expression "<=" expression
           | expression "==" expression
           | expression "!=" expression
-          | "+" expression %prec UPLUS
-          | "-" expression %prec UMINUS
-          | "!" expression
-          | "~" expression
-          | "*" IDENTIFIER %prec DEREFERENCE
-          | "&" IDENTIFIER %prec ADDRESS_OF
-          | "++" IDENTIFIER %prec PRE_INCREMENT
-          | "--" IDENTIFIER %prec PRE_DECREMENT
-          | IDENTIFIER "++" %prec POST_INCREMENT
-          | IDENTIFIER "--" %prec POST_DECREMENT
           | IDENTIFIER "=" expression
           | IDENTIFIER "+=" expression
           | IDENTIFIER "-=" expression
@@ -246,7 +251,18 @@ expression: expression "+" expression
           | IDENTIFIER "^=" expression
           | IDENTIFIER "<<=" expression
           | IDENTIFIER ">>=" expression
+          | "+" expression %prec UPLUS
+          | "-" expression %prec UMINUS
+          | "!" expression
+          | "~" expression
+          | "*" IDENTIFIER %prec DEREFERENCE
+          | "&" IDENTIFIER %prec ADDRESS_OF
+          | "++" IDENTIFIER %prec PRE_INCREMENT
+          | "--" IDENTIFIER %prec PRE_DECREMENT
+          | IDENTIFIER "++" %prec POST_INCREMENT
+          | IDENTIFIER "--" %prec POST_DECREMENT
           | "(" expression ")"
+          | functionCall
           | IDENTIFIER
           | INTEGER_LITERAL
           | FLOATING_LITERAL
