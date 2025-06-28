@@ -33,13 +33,14 @@
             yylloc.initialize (fname, 1, 1);
         }
 
-        void update_loc () {
+        void update_loc ()
+        {
             yylloc.step ();
             yylloc.end.column += yyleng;
-            cout << yylloc << " " << yytext << '\n';
         }
 
-        void update_loc_mc () {
+        void update_loc_mc ()
+        {
             const string& s = yytext;
 
             for (const char& c: s)

@@ -397,21 +397,21 @@ struct yy_trans_info
 	};
 static const flex_int16_t yy_accept[138] =
     {   0,
-        0,    0,   63,   61,   37,   36,   52,   61,   46,   53,
-       42,   43,   44,   47,   58,   48,   59,   45,   31,   60,
-       57,   51,   49,   50,   34,   55,   34,   34,   34,   34,
-       34,   34,   34,   34,   40,   54,   41,   56,   16,    0,
-       35,    0,   22,   13,   24,   20,   10,    0,   31,   18,
-       11,   19,   30,    0,   38,   21,   30,    0,   28,   15,
-       17,   14,   29,   34,   25,   34,   34,   34,   34,   34,
-        8,   34,   34,   34,   34,   23,   12,    0,    0,    0,
-       38,   30,    0,   31,   26,   27,   34,   34,   34,   34,
-       34,   34,   34,   34,   34,   34,    0,   30,   39,   34,
+        0,    0,   63,   61,   17,   16,   52,   61,   46,   53,
+       42,   43,   44,   47,   58,   48,   59,   45,   11,   60,
+       57,   51,   49,   50,   14,   55,   14,   14,   14,   14,
+       14,   14,   14,   14,   40,   54,   41,   56,   26,    0,
+       15,    0,   32,   23,   34,   30,   20,    0,   11,   28,
+       21,   29,   10,    0,   18,   31,   10,    0,   38,   25,
+       27,   24,   39,   14,   35,   14,   14,   14,   14,   14,
+        8,   14,   14,   14,   14,   33,   22,    0,    0,    0,
+       18,   10,    0,   11,   36,   37,   14,   14,   14,   14,
+       14,   14,   14,   14,   14,   14,    0,   10,   19,   14,
 
-       34,   34,    9,   34,   34,   34,   34,   34,   32,    1,
-       34,   34,   33,   34,   34,   34,   34,   34,   34,   34,
-       34,    3,    2,   34,   34,    4,   34,   34,   34,   34,
-       34,   34,    5,   34,    7,    6,    0
+       14,   14,    9,   14,   14,   14,   14,   14,   12,    1,
+       14,   14,   13,   14,   14,   14,   14,   14,   14,   14,
+       14,    3,    2,   14,   14,    4,   14,   14,   14,   14,
+       14,   14,    5,   14,    7,    6,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -555,13 +555,13 @@ static const flex_int16_t yy_chk[223] =
 
 static const flex_int16_t yy_rule_linenum[62] =
     {   0,
-       22,   23,   24,   25,   26,   27,   28,   29,   30,   32,
-       33,   34,   35,   36,   37,   38,   39,   40,   41,   42,
-       43,   44,   45,   46,   47,   48,   49,   50,   51,   53,
-       54,   55,   56,   58,   59,   61,   62,   63,   65,   78,
-       79,   80,   81,   82,   83,   84,   85,   86,   87,   88,
-       89,   90,   91,   92,   93,   94,   95,   96,   97,  100,
-      102
+       30,   31,   32,   33,   34,   35,   36,   37,   38,   40,
+       41,   42,   43,   45,   46,   48,   49,   51,   52,   54,
+       55,   56,   57,   58,   59,   60,   61,   62,   63,   64,
+       65,   66,   67,   68,   69,   70,   71,   72,   73,   75,
+       76,   77,   78,   79,   80,   81,   82,   83,   84,   85,
+       86,   87,   88,   89,   90,   91,   92,   93,   94,   95,
+       97
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -781,7 +781,7 @@ YY_DECL
 
 	{
 /* %% [7.0] user's declarations go here */
-#line 21 "lexer.l"
+#line 29 "lexer.l"
 
 #line 786 "lexer.cpp"
 
@@ -860,333 +860,322 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 22 "lexer.l"
+#line 30 "lexer.l"
 { update_loc (); return parser::make_CLASS (yylloc); }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 23 "lexer.l"
+#line 31 "lexer.l"
 { update_loc (); return parser::make_RETURN (yylloc); }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 24 "lexer.l"
+#line 32 "lexer.l"
 { update_loc (); return parser::make_PUBLIC (yylloc); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 25 "lexer.l"
+#line 33 "lexer.l"
 { update_loc (); return parser::make_PRIVATE (yylloc); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 26 "lexer.l"
+#line 34 "lexer.l"
 { update_loc (); return parser::make_PROTECTED (yylloc); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 27 "lexer.l"
+#line 35 "lexer.l"
 { update_loc (); return parser::make_CONSTRUCTOR (yylloc); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 28 "lexer.l"
+#line 36 "lexer.l"
 { update_loc (); return parser::make_DESTRUCTOR (yylloc); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 29 "lexer.l"
+#line 37 "lexer.l"
 { update_loc (); return parser::make_IF (yylloc); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 30 "lexer.l"
+#line 38 "lexer.l"
 { update_loc (); return parser::make_ELSE (yylloc); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 32 "lexer.l"
-{ update_loc (); return parser::make_INCREMENT (yylloc); }
+#line 40 "lexer.l"
+{ update_loc (); return parser::make_FLOATING_LITERAL (stold (yytext), yylloc); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 33 "lexer.l"
-{ update_loc (); return parser::make_DECREMENT (yylloc); }
+#line 41 "lexer.l"
+{ update_loc (); return parser::make_INTEGER_LITERAL  (stoll (yytext), yylloc); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 34 "lexer.l"
-{ update_loc (); return parser::make_LOGICAL_OR (yylloc); }
+#line 42 "lexer.l"
+{ update_loc (); return parser::make_BOOLEAN_LITERAL  (true, yylloc); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 35 "lexer.l"
-{ update_loc (); return parser::make_LOGICAL_AND (yylloc); }
+#line 43 "lexer.l"
+{ update_loc (); return parser::make_BOOLEAN_LITERAL  (false, yylloc); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 36 "lexer.l"
-{ update_loc (); return parser::make_GE (yylloc); }
+#line 45 "lexer.l"
+{ update_loc (); return parser::make_IDENTIFIER     (yytext, yylloc); }
 	YY_BREAK
 case 15:
+/* rule 15 can match eol */
 YY_RULE_SETUP
-#line 37 "lexer.l"
-{ update_loc (); return parser::make_LE (yylloc); }
+#line 46 "lexer.l"
+{ update_loc (); return parser::make_STRING_LITERAL (yytext, yylloc); }
 	YY_BREAK
 case 16:
+/* rule 16 can match eol */
 YY_RULE_SETUP
-#line 38 "lexer.l"
-{ update_loc (); return parser::make_NE (yylloc); }
+#line 48 "lexer.l"
+{ yylloc.begin.line = ++yylloc.end.line; yylloc.begin.column = yylloc.end.column = 1; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 39 "lexer.l"
-{ update_loc (); return parser::make_E (yylloc); }
+#line 49 "lexer.l"
+{ update_loc (); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 40 "lexer.l"
-{ update_loc (); return parser::make_PLUS_ASSIGNMENT (yylloc); }
+#line 51 "lexer.l"
+{}
 	YY_BREAK
 case 19:
+/* rule 19 can match eol */
 YY_RULE_SETUP
-#line 41 "lexer.l"
-{ update_loc (); return parser::make_MINUS_ASSIGNMENT (yylloc); }
+#line 52 "lexer.l"
+{ update_loc_mc (); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 42 "lexer.l"
-{ update_loc (); return parser::make_MULTIPLY_ASSIGNMENT (yylloc); }
+#line 54 "lexer.l"
+{ update_loc (); return parser::make_INCREMENT (yylloc); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 43 "lexer.l"
-{ update_loc (); return parser::make_DIVIDE_ASSIGNMENT (yylloc); }
+#line 55 "lexer.l"
+{ update_loc (); return parser::make_DECREMENT (yylloc); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 44 "lexer.l"
-{ update_loc (); return parser::make_MODULO_ASSIGNMENT (yylloc); }
+#line 56 "lexer.l"
+{ update_loc (); return parser::make_LOGICAL_OR (yylloc); }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 45 "lexer.l"
-{ update_loc (); return parser::make_BIT_OR_ASSIGNMENT (yylloc); }
+#line 57 "lexer.l"
+{ update_loc (); return parser::make_LOGICAL_AND (yylloc); }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 46 "lexer.l"
-{ update_loc (); return parser::make_BIT_AND_ASSIGNMENT (yylloc); }
+#line 58 "lexer.l"
+{ update_loc (); return parser::make_GE (yylloc); }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 47 "lexer.l"
-{ update_loc (); return parser::make_BIT_XOR_ASSIGNMENT (yylloc); }
+#line 59 "lexer.l"
+{ update_loc (); return parser::make_LE (yylloc); }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 48 "lexer.l"
-{ update_loc (); return parser::make_LEFT_SHIFT_ASSIGNMENT (yylloc); }
+#line 60 "lexer.l"
+{ update_loc (); return parser::make_NE (yylloc); }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 49 "lexer.l"
-{ update_loc (); return parser::make_RIGHT_SHIFT_ASSIGNMENT (yylloc); }
+#line 61 "lexer.l"
+{ update_loc (); return parser::make_E (yylloc); }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 50 "lexer.l"
-{ update_loc (); return parser::make_LEFT_SHIFT (yylloc); }
+#line 62 "lexer.l"
+{ update_loc (); return parser::make_PLUS_ASSIGNMENT (yylloc); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 51 "lexer.l"
-{ update_loc (); return parser::make_RIGHT_SHIFT (yylloc); }
+#line 63 "lexer.l"
+{ update_loc (); return parser::make_MINUS_ASSIGNMENT (yylloc); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 53 "lexer.l"
-{ update_loc (); return parser::make_FLOATING_LITERAL (stold (yytext), yylloc); }
+#line 64 "lexer.l"
+{ update_loc (); return parser::make_MULTIPLY_ASSIGNMENT (yylloc); }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 54 "lexer.l"
-{ update_loc (); return parser::make_INTEGER_LITERAL  (stoll (yytext), yylloc); }
+#line 65 "lexer.l"
+{ update_loc (); return parser::make_DIVIDE_ASSIGNMENT (yylloc); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 55 "lexer.l"
-{ update_loc (); return parser::make_BOOLEAN_LITERAL  (true, yylloc); }
+#line 66 "lexer.l"
+{ update_loc (); return parser::make_MODULO_ASSIGNMENT (yylloc); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 56 "lexer.l"
-{ update_loc (); return parser::make_BOOLEAN_LITERAL  (false, yylloc); }
+#line 67 "lexer.l"
+{ update_loc (); return parser::make_BIT_OR_ASSIGNMENT (yylloc); }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 58 "lexer.l"
-{ update_loc (); return parser::make_IDENTIFIER     (yytext, yylloc); }
+#line 68 "lexer.l"
+{ update_loc (); return parser::make_BIT_AND_ASSIGNMENT (yylloc); }
 	YY_BREAK
 case 35:
-/* rule 35 can match eol */
 YY_RULE_SETUP
-#line 59 "lexer.l"
-{ update_loc (); return parser::make_STRING_LITERAL (yytext, yylloc); }
+#line 69 "lexer.l"
+{ update_loc (); return parser::make_BIT_XOR_ASSIGNMENT (yylloc); }
 	YY_BREAK
 case 36:
-/* rule 36 can match eol */
 YY_RULE_SETUP
-#line 61 "lexer.l"
-{ yylloc.begin.line = ++yylloc.end.line; yylloc.begin.column = yylloc.end.column = 1; }
+#line 70 "lexer.l"
+{ update_loc (); return parser::make_LEFT_SHIFT_ASSIGNMENT (yylloc); }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 62 "lexer.l"
-{ update_loc (); }
+#line 71 "lexer.l"
+{ update_loc (); return parser::make_RIGHT_SHIFT_ASSIGNMENT (yylloc); }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 63 "lexer.l"
-{}
+#line 72 "lexer.l"
+{ update_loc (); return parser::make_LEFT_SHIFT (yylloc); }
 	YY_BREAK
 case 39:
-/* rule 39 can match eol */
 YY_RULE_SETUP
-#line 65 "lexer.l"
-{
-    const string& s = yytext;
-
-    for (const char& c: s)
-    {
-        if (c == '\n')
-            yylloc.begin.line = ++yylloc.end.line,
-            yylloc.begin.column = yylloc.end.column = 1;
-
-        else
-            yylloc.begin.column = ++yylloc.end.column;
-    }}
+#line 73 "lexer.l"
+{ update_loc (); return parser::make_RIGHT_SHIFT (yylloc); }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 78 "lexer.l"
+#line 75 "lexer.l"
 { update_loc (); return parser::make_LBRACE (yylloc); }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 79 "lexer.l"
+#line 76 "lexer.l"
 { update_loc (); return parser::make_RBRACE (yylloc); }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 80 "lexer.l"
+#line 77 "lexer.l"
 { update_loc (); return parser::make_LPAREN (yylloc); }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 81 "lexer.l"
+#line 78 "lexer.l"
 { update_loc (); return parser::make_RPAREN (yylloc); }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 82 "lexer.l"
+#line 79 "lexer.l"
 { update_loc (); return parser::make_MULTIPLY (yylloc); }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 83 "lexer.l"
+#line 80 "lexer.l"
 { update_loc (); return parser::make_DIVIDE (yylloc); }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 84 "lexer.l"
+#line 81 "lexer.l"
 { update_loc (); return parser::make_MODULO (yylloc); }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 85 "lexer.l"
+#line 82 "lexer.l"
 { update_loc (); return parser::make_PLUS (yylloc); }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 86 "lexer.l"
+#line 83 "lexer.l"
 { update_loc (); return parser::make_MINUS (yylloc); }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 87 "lexer.l"
+#line 84 "lexer.l"
 { update_loc (); return parser::make_ASSIGNMENT (yylloc); }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 88 "lexer.l"
+#line 85 "lexer.l"
 { update_loc (); return parser::make_GREATER (yylloc); }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 89 "lexer.l"
+#line 86 "lexer.l"
 { update_loc (); return parser::make_LESSER (yylloc); }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 90 "lexer.l"
+#line 87 "lexer.l"
 { update_loc (); return parser::make_LOGICAL_NOT (yylloc); }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 91 "lexer.l"
+#line 88 "lexer.l"
 { update_loc (); return parser::make_BIT_AND (yylloc); }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 92 "lexer.l"
+#line 89 "lexer.l"
 { update_loc (); return parser::make_BIT_OR (yylloc); }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 93 "lexer.l"
+#line 90 "lexer.l"
 { update_loc (); return parser::make_BIT_XOR (yylloc); }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 94 "lexer.l"
+#line 91 "lexer.l"
 { update_loc (); return parser::make_BIT_NOT (yylloc); }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 95 "lexer.l"
+#line 92 "lexer.l"
 { update_loc (); return parser::make_SEMICOLON (yylloc); }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 96 "lexer.l"
+#line 93 "lexer.l"
 { update_loc (); return parser::make_COMMA (yylloc); }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 97 "lexer.l"
+#line 94 "lexer.l"
 { update_loc (); return parser::make_DOT (yylloc); }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 100 "lexer.l"
+#line 95 "lexer.l"
 { update_loc (); return parser::make_COLON (yylloc); }
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 102 "lexer.l"
+#line 97 "lexer.l"
 { update_loc (); return parser::make_UNKNOWN (yylloc); }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 103 "lexer.l"
+#line 98 "lexer.l"
 { update_loc (); return parser::make_YYEOF (yylloc); }
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 104 "lexer.l"
+#line 99 "lexer.l"
 ECHO;
 	YY_BREAK
-#line 1189 "lexer.cpp"
+#line 1178 "lexer.cpp"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2303,5 +2292,5 @@ void yyfree (void * ptr )
 
 /* %ok-for-header */
 
-#line 104 "lexer.l"
+#line 99 "lexer.l"
 

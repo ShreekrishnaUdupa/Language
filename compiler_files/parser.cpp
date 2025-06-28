@@ -2531,10 +2531,25 @@ switch (yykind)
             yylloc.initialize (fname, 1, 1);
         }
 
-        void update_loc () {
+        void update_loc ()
+        {
             yylloc.step ();
             yylloc.end.column += yyleng;
-            cout << yylloc << " " << yytext << '\n';
+        }
+
+        void update_loc_mc ()
+        {
+            const string& s = yytext;
+
+            for (const char& c: s)
+            {
+                if (c == '\n')
+                    yylloc.begin.line = ++yylloc.end.line,
+                    yylloc.begin.column = yylloc.end.column = 1;
+
+                else
+                    yylloc.begin.column = ++yylloc.end.column;
+            }
         }
 
         yy::parser::symbol_type scan ();
@@ -2550,7 +2565,7 @@ switch (yykind)
         cerr << loc << " " << msg;
     }
 
-#line 2554 "parser.cpp"
+#line 2569 "parser.cpp"
 
 
 #ifndef YY_
@@ -2643,7 +2658,7 @@ switch (yykind)
 
 #line 5 "parser.y"
 namespace yy {
-#line 2647 "parser.cpp"
+#line 2662 "parser.cpp"
 
   /// Build a parser object.
   parser::parser (ifstream& fin_yyarg, string* filename_yyarg)
@@ -3132,13 +3147,13 @@ namespace yy {
           switch (yyn)
             {
   case 2: // program: classes
-#line 139 "parser.y"
+#line 154 "parser.y"
                  {cout << "Valid program!\n"; }
-#line 3138 "parser.cpp"
+#line 3153 "parser.cpp"
     break;
 
 
-#line 3142 "parser.cpp"
+#line 3157 "parser.cpp"
 
             default:
               break;
@@ -3875,16 +3890,16 @@ namespace yy {
   const short
   parser::yyrline_[] =
   {
-       0,   139,   139,   142,   143,   146,   150,   151,   154,   155,
-     156,   157,   160,   161,   164,   165,   166,   169,   170,   173,
-     174,   177,   179,   181,   184,   185,   188,   189,   192,   194,
-     195,   198,   199,   202,   204,   207,   208,   211,   214,   215,
-     218,   219,   220,   221,   222,   223,   224,   227,   228,   229,
-     230,   231,   232,   233,   234,   235,   236,   237,   238,   239,
-     240,   241,   242,   243,   244,   245,   246,   247,   248,   249,
-     250,   251,   252,   253,   254,   255,   256,   257,   258,   259,
-     260,   261,   262,   263,   264,   265,   266,   267,   268,   269,
-     270,   271,   272
+       0,   154,   154,   157,   158,   161,   165,   166,   169,   170,
+     171,   172,   175,   176,   179,   180,   181,   184,   185,   188,
+     189,   192,   194,   196,   199,   200,   203,   204,   207,   209,
+     210,   213,   214,   217,   219,   222,   223,   226,   229,   230,
+     233,   234,   235,   236,   237,   238,   239,   242,   243,   244,
+     245,   246,   247,   248,   249,   250,   251,   252,   253,   254,
+     255,   256,   257,   258,   259,   260,   261,   262,   263,   264,
+     265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
+     275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
+     285,   286,   287
   };
 
   void
@@ -3917,9 +3932,9 @@ namespace yy {
 
 #line 5 "parser.y"
 } // yy
-#line 3921 "parser.cpp"
+#line 3936 "parser.cpp"
 
-#line 274 "parser.y"
+#line 289 "parser.y"
 
 
 int main () {
