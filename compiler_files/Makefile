@@ -1,11 +1,11 @@
 all:
-	bison -tv -o parser.cpp parser.y;
-	flex -o lexer.cpp lexer.l;
-	clang++ -O3 -I . -I D:/llvm/include -L D:/llvm/lib -l LLVMCore -l LLVMSupport -o anial lexer.cpp
-
-test:
-	./anial
+	bison -tv -o parser.cpp parser.y
+	flex -o lexer.cpp lexer.l
+	clang++ lexer.cpp -O3 -I D:/llvm/include -I . -lLLVMCore -lLLVMSupport -o anial
 
 clean:
-	rm -rf anial.exe lexer.cpp parser.cpp parser.output location.hpp;
+	rm anial lexer.cpp parser.cpp location.hpp parser.output;
 	clear;
+
+test:
+	./anial;

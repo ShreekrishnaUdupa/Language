@@ -36,6 +36,21 @@
         void update_loc () {
             yylloc.step ();
             yylloc.end.column += yyleng;
+            cout << yylloc << " " << yytext << '\n';
+        }
+
+        void update_loc_mc () {
+            const string& s = yytext;
+
+            for (const char& c: s)
+            {
+                if (c == '\n')
+                    yylloc.begin.line = ++yylloc.end.line,
+                    yylloc.begin.column = yylloc.end.column = 1;
+
+                else
+                    yylloc.begin.column = ++yylloc.end.column;
+            }
         }
 
         yy::parser::symbol_type scan ();
@@ -61,13 +76,13 @@
 %token DESTRUCTOR "destructor"
 %token IF "if"
 %token ELSE "else"
+
 %token LBRACE "{"
 %token RBRACE "}"
 %token LPAREN "("
 %token RPAREN ")"
 %token DOT "."
 %token COLON ":"
-
 %token SEMICOLON ";"
 %token COMMA ","
 %token UNKNOWN
@@ -112,6 +127,7 @@
 
 %token <long long int> INTEGER_LITERAL
 %token <long double> FLOATING_LITERAL
+%token <bool> BOOLEAN_LITERAL
 %token <string> STRING_LITERAL
 %token <string> IDENTIFIER
 
@@ -266,6 +282,7 @@ expression: expression "+" expression
           | IDENTIFIER
           | INTEGER_LITERAL
           | FLOATING_LITERAL
+          | BOOLEAN_LITERAL
           | STRING_LITERAL
           ;
 %%

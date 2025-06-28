@@ -17,6 +17,11 @@
 using namespace std;
 using namespace llvm;
 
+static LLVMContext context;
+static IRBuilder<> builder (context);
+static Module module ("main", context);
+static vector<map<string, Value*>> symbolTable;
+
 class Node {
 public:
     virtual Value* codeGen () = 0;
@@ -32,7 +37,7 @@ public:
 
     Integer_literal (long long& n) : n(n) {}
 
-    Value* codeGen () override;
+    Value* codeGen ();
     virtual ~Integer_literal () {}
 };
 
