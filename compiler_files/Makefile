@@ -8,4 +8,4 @@ clean:
 	clear;
 
 test:
-	./anial;
+	./anial file.anial;

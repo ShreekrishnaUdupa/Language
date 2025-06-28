@@ -288,10 +288,10 @@ expression: expression "+" expression
           ;
 %%
 
-int main () {
+int main (int argc, char** argv) {
 
-    string filename ("file.anial");
-    ifstream fin ("file.anial");
+    string filename = argv[1];
+    ifstream fin (filename);
 
     yy::parser p(fin, &filename);
     p.parse ();
