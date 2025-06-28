@@ -14,12 +14,25 @@
 #include "llvm/IR/Type.h"
 #include "llvm/IR/Verifier.h"
 
+#include <llvm/ExecutionEngine/GenericValue.h>
+#include <llvm/IR/PassManager.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/IR/CallingConv.h>
+#include <llvm/IR/Verifier.h>
+#include <llvm/Support/TargetSelect.h>
+#include <llvm/Support/raw_ostream.h>
+#include "llvm/Support/SourceMgr.h"
+#include "llvm/Support/MemoryBuffer.h"
+#include "llvm/IRReader/IRReader.h"
+#include "llvm/Linker/Linker.h"
+#include "llvm/Support/Error.h"
+
 using namespace std;
 using namespace llvm;
 
 static LLVMContext context;
-static IRBuilder<> builder (context);
 static Module module ("main", context);
+static IRBuilder<> builder (context);
 static vector<map<string, Value*>> symbolTable;
 
 class Node {
