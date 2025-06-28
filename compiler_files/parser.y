@@ -8,6 +8,7 @@
 %define api.value.type variant
 %define parse.error detailed
 %define parse.lac full
+
 %locations
 %define api.location.file "location.hpp"
 
@@ -59,7 +60,7 @@
 
     yy::parser::symbol_type yylex (ifstream& fin, string* filename) {
         static Lexer lexer (fin, filename);
-        // lexer.set_debug (1);
+        // lexer.set_debug (true);
         return lexer.scan ();
     }
 
@@ -294,6 +295,8 @@ int main (int argc, char** argv) {
     ifstream fin (filename);
 
     yy::parser p(fin, &filename);
+    /* p.set_debug_level(1); */
+
     p.parse ();
 
     return 0;
