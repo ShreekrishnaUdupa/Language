@@ -11,7 +11,7 @@
 
 // class Int {
 // public:
-//     int value;
+//     int32_t value;
 
 //     Int (int value) {
 //         this->value = value;
@@ -164,10 +164,25 @@
 // template <AllowedClass T, AllowedClass U>
 // Int operator % (const T& a, const U& b) { return Int(a.value % b.value); }
 
-int main ()
-{
-    // Console console;
+// int main ()
+// {
+//     // Console console;
 
-    // console.print("This should be in some random color", "#111111");
+//     // console.print("This should be in some random color", "#111111");
+//     return 0;
+// }
+
+
+class Int {
+public:
+    int value;
+
+    Int (int value) {
+        this->value = value;
+    }
+};
+
+int main () {
+    Int x(42);
     return 0;
 }

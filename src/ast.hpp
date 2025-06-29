@@ -50,8 +50,7 @@ public:
 
     Integer_literal (long long& n) : n(n) {}
 
-    Value* codeGen ();
-    virtual ~Integer_literal () {}
+    Value* codeGen () override;
 };
 
 class Floating_literal: public Expression {
@@ -61,7 +60,6 @@ public:
     Floating_literal (long double& n) : n(n) {}
 
     Value* codeGen () override;
-    virtual ~Floating_literal () {}
 };
 
 class String_literal: public Expression {
@@ -71,7 +69,6 @@ public:
     String_literal (string& s) : s(s) {}
 
     Value* codeGen () override;
-    virtual ~String_literal () {}
 };
 
 class Identifier: public Expression {
