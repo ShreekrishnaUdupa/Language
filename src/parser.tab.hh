@@ -32,7 +32,7 @@
 
 
 /**
- ** \file parser.hpp
+ ** \file parser.tab.hh
  ** Define the yy::parser class.
  */
 
@@ -42,8 +42,8 @@
 // especially those whose name start with YY_ or yy_.  They are
 // private implementation details that can be changed or removed.
 
-#ifndef YY_YY_PARSER_HPP_INCLUDED
-# define YY_YY_PARSER_HPP_INCLUDED
+#ifndef YY_YY_PARSER_TAB_HH_INCLUDED
+# define YY_YY_PARSER_TAB_HH_INCLUDED
 // "%code requires" blocks.
 #line 18 "parser.y"
 
@@ -53,8 +53,9 @@
     #include "ast.hpp"
 
     using namespace std;
+    using token = yy::parser::token;
 
-#line 58 "parser.hpp"
+#line 59 "parser.tab.hh"
 
 
 # include <cstdlib> // std::abort
@@ -190,7 +191,7 @@
 
 #line 5 "parser.y"
 namespace yy {
-#line 194 "parser.hpp"
+#line 195 "parser.tab.hh"
 
 
 
@@ -386,18 +387,21 @@ namespace yy {
     /// An auxiliary type to compute the largest semantic type.
     union union_type
     {
+      // expression
+      char dummy1[sizeof (Expression*)];
+
       // BOOLEAN_LITERAL
-      char dummy1[sizeof (bool)];
+      char dummy2[sizeof (bool)];
 
       // FLOATING_LITERAL
-      char dummy2[sizeof (long double)];
+      char dummy3[sizeof (long double)];
 
       // INTEGER_LITERAL
-      char dummy3[sizeof (long long int)];
+      char dummy4[sizeof (long long int)];
 
       // STRING_LITERAL
       // IDENTIFIER
-      char dummy4[sizeof (string)];
+      char dummy5[sizeof (string)];
     };
 
     /// The size of the largest semantic type.
@@ -601,26 +605,28 @@ namespace yy {
         S_classes = 69,                          // classes
         S_classDef = 70,                         // classDef
         S_optionalSemicolons = 71,               // optionalSemicolons
-        S_accessSpecifiers = 72,                 // accessSpecifiers
-        S_functions = 73,                        // functions
-        S_function = 74,                         // function
-        S_parameters = 75,                       // parameters
-        S_parametersList = 76,                   // parametersList
-        S_constructorDef = 77,                   // constructorDef
-        S_destructorDef = 78,                    // destructorDef
-        S_variableDeclarations = 79,             // variableDeclarations
-        S_init = 80,                             // init
-        S_moreVariableDeclarations = 81,         // moreVariableDeclarations
-        S_functionCall = 82,                     // functionCall
-        S_arguments = 83,                        // arguments
-        S_argumentsList = 84,                    // argumentsList
-        S_ifStatement = 85,                      // ifStatement
-        S_ifElseStatement = 86,                  // ifElseStatement
-        S_elseIfStatement = 87,                  // elseIfStatement
-        S_elseStatement = 88,                    // elseStatement
-        S_statements = 89,                       // statements
-        S_statement = 90,                        // statement
-        S_expression = 91                        // expression
+        S_classMembers = 72,                     // classMembers
+        S_accessSpecifiers = 73,                 // accessSpecifiers
+        S_functionDeclarations = 74,             // functionDeclarations
+        S_function = 75,                         // function
+        S_parameters = 76,                       // parameters
+        S_parametersList = 77,                   // parametersList
+        S_constructorDef = 78,                   // constructorDef
+        S_destructorDef = 79,                    // destructorDef
+        S_variableDeclarations = 80,             // variableDeclarations
+        S_init = 81,                             // init
+        S_moreVariableDeclarations = 82,         // moreVariableDeclarations
+        S_memberAccess = 83,                     // memberAccess
+        S_functionCall = 84,                     // functionCall
+        S_arguments = 85,                        // arguments
+        S_argumentsList = 86,                    // argumentsList
+        S_ifStatement = 87,                      // ifStatement
+        S_ifElseStatement = 88,                  // ifElseStatement
+        S_elseIfStatement = 89,                  // elseIfStatement
+        S_elseStatement = 90,                    // elseStatement
+        S_statements = 91,                       // statements
+        S_statement = 92,                        // statement
+        S_expression = 93                        // expression
       };
     };
 
@@ -657,6 +663,10 @@ namespace yy {
       {
         switch (this->kind ())
     {
+      case symbol_kind::S_expression: // expression
+        value.move< Expression* > (std::move (that.value));
+        break;
+
       case symbol_kind::S_BOOLEAN_LITERAL: // BOOLEAN_LITERAL
         value.move< bool > (std::move (that.value));
         break;
@@ -693,6 +703,20 @@ namespace yy {
 #else
       basic_symbol (typename Base::kind_type t, const location_type& l)
         : Base (t)
+        , location (l)
+      {}
+#endif
+
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, Expression*&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const Expression*& v, const location_type& l)
+        : Base (t)
+        , value (v)
         , location (l)
       {}
 #endif
@@ -777,6 +801,10 @@ namespace yy {
         // Value type destructor.
 switch (yykind)
     {
+      case symbol_kind::S_expression: // expression
+        value.template destroy< Expression* > ();
+        break;
+
       case symbol_kind::S_BOOLEAN_LITERAL: // BOOLEAN_LITERAL
         value.template destroy< bool > ();
         break;
@@ -2058,7 +2086,7 @@ switch (yykind)
     static const signed char yydefact_[];
 
     // YYPGOTO[NTERM-NUM].
-    static const signed char yypgoto_[];
+    static const short yypgoto_[];
 
     // YYDEFGOTO[NTERM-NUM].
     static const unsigned char yydefgoto_[];
@@ -2319,8 +2347,8 @@ switch (yykind)
     /// Constants.
     enum
     {
-      yylast_ = 662,     ///< Last index in yytable_.
-      yynnts_ = 25,  ///< Number of nonterminal symbols.
+      yylast_ = 701,     ///< Last index in yytable_.
+      yynnts_ = 27,  ///< Number of nonterminal symbols.
       yyfinal_ = 3 ///< Termination state number.
     };
 
@@ -2395,6 +2423,10 @@ switch (yykind)
   {
     switch (this->kind ())
     {
+      case symbol_kind::S_expression: // expression
+        value.copy< Expression* > (YY_MOVE (that.value));
+        break;
+
       case symbol_kind::S_BOOLEAN_LITERAL: // BOOLEAN_LITERAL
         value.copy< bool > (YY_MOVE (that.value));
         break;
@@ -2443,6 +2475,10 @@ switch (yykind)
     super_type::move (s);
     switch (this->kind ())
     {
+      case symbol_kind::S_expression: // expression
+        value.move< Expression* > (YY_MOVE (s.value));
+        break;
+
       case symbol_kind::S_BOOLEAN_LITERAL: // BOOLEAN_LITERAL
         value.move< bool > (YY_MOVE (s.value));
         break;
@@ -2527,9 +2563,9 @@ switch (yykind)
 
 #line 5 "parser.y"
 } // yy
-#line 2531 "parser.hpp"
+#line 2567 "parser.tab.hh"
 
 
 
 
-#endif // !YY_YY_PARSER_HPP_INCLUDED
+#endif // !YY_YY_PARSER_TAB_HH_INCLUDED

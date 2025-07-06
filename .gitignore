@@ -1,0 +1,11 @@
+./src/core.ll
+./src/grammar.txt
+./src/parser.tab.cc
+./src/parser.tab.hh
+./src/remaining.txt
+./src/anial
+./src/lexer.cpp
+./src/parser.cpp
+./src/parser.hpp
+./src/location.hpp
+./src/parser.output;

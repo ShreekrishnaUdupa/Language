@@ -22,6 +22,7 @@
     #include "ast.hpp"
 
     using namespace std;
+    using token = yy::parser::token;
 }
 
 %code {
@@ -133,6 +134,14 @@
 %token <string> STRING_LITERAL
 %token <string> IDENTIFIER
 
+%nterm <Expression*> expression
+%nterm <Statement*> statement
+%nterm <vector<Statement*>> statements
+%nterm <vector<Parameter*>> parametersList
+%nterm <FunctionDeclaration*> functionDeclaration
+%nterm <VariableDeclartios
+
+
 %left ","
 %right "=" "+=" "-=" "*=" "/=" "%=" "&=" "|=" "^=" "<<=" ">>="
 %left "||"
@@ -149,6 +158,8 @@
 %left POST_INCREMENT POST_DECREMENT
 %left "("
 
+%glr-parser
+%expect 2
 %start program
 
 %%
@@ -159,13 +170,23 @@ classes: classes classDef
        | %empty
        ;
 
-classDef: "class" IDENTIFIER "{" functions "}" optionalSemicolons
+classDef: "class" IDENTIFIER "{" classMembers "}" optionalSemicolons
         ;
-
 
 optionalSemicolons: optionalSemicolons ";"
                   | %empty
                   ;
+
+classMembers: classMembers classMember
+            | %empty
+            ;
+
+classMember: variableDeclarations
+           | functionDeclarations
+           ;
+
+
+// Needs fixing regarding functionDeclarations and all
 
 accessSpecifiers: "public" ":"
                 | "private" ":"
@@ -173,14 +194,16 @@ accessSpecifiers: "public" ":"
                 | %empty
                 ;
 
-functions: functions accessSpecifiers function optionalSemicolons
-         | %empty
+functionDeclarations: accessSpecifiers functionDeclarations function optionalSemicolons
+         | 
          ;
 
-function: IDENTIFIER IDENTIFIER "(" parameters ")" "{" statements "}"
-        | constructorDef
+function: accessSpecifiers IDENTIFIER IDENTIFIER "(" parameters ")" "{" statements "}" optionalSemicolons
+        | constructorDeclaration
         | destructorDef
         ;
+
+// ---------- //
 
 parameters: parametersList
 		  | %empty
@@ -190,42 +213,33 @@ parametersList: IDENTIFIER IDENTIFIER
 			  | parametersList "," IDENTIFIER IDENTIFIER
 			  ;
 
-constructorDef: "constructor" "(" parameters ")" "{" statements "}"
+constructorDeclaration: "constructor" "(" parameters ")" "{" statements "}"
 
 destructorDef: "destructor" "(" ")" "{" statements "}"
 
-variableDeclarations: IDENTIFIER IDENTIFIER init moreVariableDeclarations ";"
-           ;
+variableDeclarations: IDENTIFIER IDENTIFIER init moreVariableDeclarations ";" optionalSemicolons
+                    {
+                        vector<VariableDeclaration*> vars;
+                        vars.push_back(new VariableDeclaration($1, $2, $3));
+                        vars.insert(vars.end(), $4.begin(), $4.end());
 
-init: "=" expression
-    | %empty
+                        for (size_t i = 1; i < vars.size(); ++i)
+                            vars[i]->type = vars[0]->type;
+                            
+                        $$ = vars;
+                    };
+
+init: "=" expression {$$ = $2}
+    | %empty {$$ = nullptr}
     ;
 
 moreVariableDeclarations: moreVariableDeclarations "," IDENTIFIER init
-                | %empty
-                ;
-
-functionCall: IDENTIFIER "(" arguments ")"
-
-arguments: argumentsList
-         | %empty
-         ;
-
-argumentsList: argumentsList "," expression
-             | expression
-             ;
-
-ifStatement: "if" "(" expression ")" "{" statements "}"
-
-ifElseStatement: ifStatement elseIfStatement elseStatement
-               ;
-
-elseIfStatement: elseIfStatement "else" ifStatement
-               | %empty
-               ;
-
-elseStatement: "else" "(" expression ")" "{" statements "}"
-             ;
+                            {
+                                $1.push_back(new VariableDeclaration("", $3, $4));
+                                $$ = $1;
+                            }
+                        | %empty {$$ = {}; }
+                        ;
         
 statements: statements statement
           | %empty
@@ -240,53 +254,82 @@ statement: variableDeclarations
          | ";"
          ;
 
-expression: expression "+" expression
-          | expression "-" expression
-          | expression "*" expression
-          | expression "/" expression
-          | expression "%" expression
-          | expression "|" expression
-          | expression "&" expression
-          | expression ">" expression
-          | expression "<" expression
-          | expression "^" expression
-          | expression "<<" expression
-          | expression ">>" expression
-          | expression "||" expression
-          | expression "&&" expression
-          | expression ">=" expression
-          | expression "<=" expression
-          | expression "==" expression
-          | expression "!=" expression
-          | IDENTIFIER "=" expression
-          | IDENTIFIER "+=" expression
-          | IDENTIFIER "-=" expression
-          | IDENTIFIER "*=" expression
-          | IDENTIFIER "/=" expression
-          | IDENTIFIER "%=" expression
-          | IDENTIFIER "&=" expression
-          | IDENTIFIER "|=" expression
-          | IDENTIFIER "^=" expression
-          | IDENTIFIER "<<=" expression
-          | IDENTIFIER ">>=" expression
-          | "+" expression %prec UPLUS
-          | "-" expression %prec UMINUS
-          | "!" expression
-          | "~" expression
-          | "*" IDENTIFIER %prec DEREFERENCE
-          | "&" IDENTIFIER %prec ADDRESS_OF
-          | "++" IDENTIFIER %prec PRE_INCREMENT
-          | "--" IDENTIFIER %prec PRE_DECREMENT
-          | IDENTIFIER "++" %prec POST_INCREMENT
-          | IDENTIFIER "--" %prec POST_DECREMENT
-          | "(" expression ")"
-          | functionCall
-          | IDENTIFIER
-          | INTEGER_LITERAL
-          | FLOATING_LITERAL
-          | BOOLEAN_LITERAL
-          | STRING_LITERAL
+expression: expression "+" expression   { $$ = new BinaryExpression ($1, token::PLUS, $3) }
+          | expression "-" expression   { $$ = new BinaryExpression ($1, token::MINUS, $3) } 
+          | expression "*" expression   { $$ = new BinaryExpression ($1, token::MULTIPLY, $3) }
+          | expression "/" expression   { $$ = new BinaryExpression ($1, token::DIVIDE, $3) }
+          | expression "%" expression   { $$ = new BinaryExpression ($1, token::MODULO, $3) }
+          | expression "|" expression   { $$ = new BinaryExpression ($1, token::BIT_OR, $3) }
+          | expression "&" expression   { $$ = new BinaryExpression ($1, token::BIT_AND, $3) }
+          | expression "^" expression   { $$ = new BinaryExpression ($1, token::BIT_XOR, $3) }
+          | expression "<<" expression  { $$ = new BinaryExpression ($1, token::LEFT_SHIFT, $3) }
+          | expression ">>" expression  { $$ = new BinaryExpression ($1, token::RIGHT_SHIFT, $3) }
+          | expression "||" expression  { $$ = new BinaryExpression ($1, token::LOGICAL_OR, $3) }
+          | expression "&&" expression  { $$ = new BinaryExpression ($1, token::LOGICAL_AND, $3) }
+          | expression ">" expression   { $$ = new BinaryExpression ($1, token::GREATER, $3) }
+          | expression "<" expression   { $$ = new BinaryExpression ($1, token::LESSER, $3) }
+          | expression ">=" expression  { $$ = new BinaryExpression ($1, token::GE, $3) }
+          | expression "<=" expression  { $$ = new BinaryExpression ($1, token::LE, $3) }
+          | expression "==" expression  { $$ = new BinaryExpression ($1, token::E, $3) }
+          | expression "!=" expression  { $$ = new BinaryExpression ($1, token::NE, $3) }
+          | expression "," expression   { $$ = new BinaryExpression ($1, token::COMMA, $3) }
+          | IDENTIFIER "=" expression   { $$ = new AssignmentExpression ($1, token::ASSIGNMENT, $3) }
+          | IDENTIFIER "+=" expression  { $$ = new AssignmentExpression ($1, token::PLUS_ASSIGNMENT, $3) }
+          | IDENTIFIER "-=" expression  { $$ = new AssignmentExpression ($1, token::MINUS_ASSIGNMENT, $3) }
+          | IDENTIFIER "*=" expression  { $$ = new AssignmentExpression ($1, token::MULTIPLY_ASSIGNMENT, $3) }
+          | IDENTIFIER "/=" expression  { $$ = new AssignmentExpression ($1, token::DIVIDE_ASSIGNMENT, $3) }
+          | IDENTIFIER "%=" expression  { $$ = new AssignmentExpression ($1, token::MODULO_ASSIGNMENT, $3) }
+          | IDENTIFIER "&=" expression  { $$ = new AssignmentExpression ($1, token::BIT_AND_ASSIGNMENT, $3) }
+          | IDENTIFIER "|=" expression  { $$ = new AssignmentExpression ($1, token::BIT_OR_ASSIGNMENT, $3) }
+          | IDENTIFIER "^=" expression  { $$ = new AssignmentExpression ($1, token::BIT_XOR_ASSIGNMENT, $3) }
+          | IDENTIFIER "<<=" expression { $$ = new AssignmentExpression ($1, token::LEFT_SHIFT_ASSIGNMENT, $3) }
+          | IDENTIFIER ">>=" expression { $$ = new AssignmentExpression ($1, token::RIGHT_SHIFT_ASSIGNMENT, $3) }
+          | "+" expression %prec UPLUS              { $$ = new UnaryExpression (token::UPLUS, $2) }
+          | "-" expression %prec UMINUS             { $$ = new UnaryExpression (token::UMINUS, $2) }
+          | "*" IDENTIFIER %prec DEREFERENCE        { $$ = new UnaryExpression (token::DEREFERENCE, $2) }
+          | "&" IDENTIFIER %prec ADDRESS_OF         { $$ = new UnaryExpression (token::ADDRESS_OF, $2) }
+          | "++" IDENTIFIER %prec PRE_INCREMENT     { $$ = new UnaryExpression (token::PRE_INCREMENT, $2) }
+          | "--" IDENTIFIER %prec PRE_DECREMENT     { $$ = new UnaryExpression (token::PRE_DECREMENT, $2) }
+          | IDENTIFIER "++" %prec POST_INCREMENT    { $$ = new UnaryExpression (token::POST_INCREMENT, $1) }
+          | IDENTIFIER "--" %prec POST_DECREMENT    { $$ = new UnaryExpression (token::POST_DECREMENT, $1) }
+          | "!" expression                          { $$ = new UnaryExpression (token::LOGICAL_NOT, $2) }
+          | "~" expression                          { $$ = new UnaryExpression (token::BIT_NOT, $2) }
+          | "(" expression ")"                      { $$ = $2 }
+          | memberAccess                            { $$ = $1 }
+          | INTEGER_LITERAL                         { $$ = new IntegerLiteralExpression ($1) }
+          | FLOATING_LITERAL                        { $$ = new FloatingLiteralExpression ($1) }
+          | BOOLEAN_LITERAL                         { $$ = new BooleanLiteralExpression ($1) }
+          | STRING_LITERAL                          { $$ = new StringLiteralExpression ($1) }
           ;
+
+ifStatement: "if" "(" expression ")" "{" statements "}"
+
+ifElseStatement: ifStatement elseIfStatement elseStatement
+               ;
+
+elseIfStatement: elseIfStatement "else" ifStatement
+               | %empty
+               ;
+
+elseStatement: "else" "(" expression ")" "{" statements "}"
+             ;
+
+memberAccess: IDENTIFIER
+            | functionCall
+            | IDENTIFIER "." memberAccess
+            | functionCall "." memberAccess
+            ;
+
+functionCall: IDENTIFIER "(" arguments ")"
+
+arguments: argumentsList
+         | %empty
+         ;
+
+argumentsList: argumentsList "," expression
+             | expression
+             ;
+
 %%
 
 int main (int argc, char** argv) {

@@ -1,6 +1,9 @@
 #pragma once
 
-#include <bits/stdc++.h>
+#include <string>
+#include <vector>
+#include <map>
+#include <memory>
 
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/IRBuilder.h"
@@ -41,32 +44,104 @@ public:
     virtual ~Node () {}
 };
 
-class Statement:  public Node {};
+class ClassMember: public Node {};
+class Statement: public Node {};
 class Expression: public Node {};
 
-class Integer_literal: public Expression {
+class Parameter: public Node {
 public:
-    long long n;
+    string type;
+    string name;
+    
+    Parameter (string& type, string& name) : type(type), name(name) {}
+};
 
-    Integer_literal (long long& n) : n(n) {}
+class FunctionDeclaration: public ClassMember {
+public:
+    string returnType;
+    string name;
+    vector<unique_ptr<Parameter>> parameters;
+    vector<unique_ptr<Statement>> body;
+    
+    FunctionDeclaration (string& returnType, string& name, vector<unique_ptr<Parameter>> parameters, vector<unique_ptr<Statement>> body) :
+        returnType(returnType), name(name), parameters(move(parameters)), body(move(body)) {}
 
     Value* codeGen () override;
 };
 
-class Floating_literal: public Expression {
+class ConstructorDeclaration: public ClassMember {
 public:
-    long double n;
+    vector<unique_ptr<Parameter>> parameters;
+    vector<unique_ptr<Statement>> body;
 
-    Floating_literal (long double& n) : n(n) {}
+    ConstructorDeclaration (vector<unique_ptr<Parameter>> parameters, vector<unique_ptr<Statement>> body) :
+        parameters(move(parameters)), body(move(body)) {}
+        
+    Value* codeGen () override;
+};
+
+class DestructorDeclaration: public ClassMember {
+public:
+    vector<Statement*> body;
+
+    DestructorDeclaration (vector<Statement*>& body) : body(body) {}
 
     Value* codeGen () override;
 };
 
-class String_literal: public Expression {
+class VariableDeclaration: public ClassMember {
+    string type;
+    string name;
+    Expression* initializer;
+
+    VariableDeclaration (string& type, string& name, Expression*& initializer) :
+        type(type), name(name), initializer(initializer) {}
+
+    Value* codeGen () override;
+};
+
+class ClassDeclarations: public Node {
+public:
+    string name;
+    vector<ClassMember*> members;
+
+    ClassDeclarations (string& name, vector<ClassMember*> members) : name(name), members(members) {}
+
+    Value* codeGen () override;
+};
+
+class IntegerLiteralExpression: public Expression {
+public:
+    long long val;
+
+    IntegerLiteralExpression (long long& val) : val(val) {}
+
+    Value* codeGen () override;
+};
+
+class FloatingLiteralExpression: public Expression {
+public:
+    long double val;
+
+    FloatingLiteralExpression (long double& n) : val(val) {}
+
+    Value* codeGen () override;
+};
+
+class BooleanLiteralExpression: public Expression {
+public:
+    bool val;
+
+    BooleanLiteralExpression (bool val) : val(val) {}
+
+    Value* codeGen () override;
+};
+
+class StringLiteralExpression: public Expression {
 public:
     string s;
 
-    String_literal (string& s) : s(s) {}
+    StringLiteralExpression (string& s) : s(s) {}
 
     Value* codeGen () override;
 };
@@ -84,10 +159,10 @@ public:
 class BinaryExpression: public Expression {
 public:
     int op;
-    Expression& lhs;
-    Expression& rhs;
+    Expression* lhs;
+    Expression* rhs;
 
-    BinaryExpression (Expression& lhs, int& op, Expression& rhs) : lhs(lhs), op(op), rhs(rhs) {}
+    BinaryExpression (Expression*& lhs, int op, Expression*& rhs) : lhs(lhs), op(op), rhs(rhs) {}
 
     Value* codeGen () override;
     virtual ~BinaryExpression () {}
@@ -95,34 +170,36 @@ public:
 
 class AssignmentExpression: public Expression {
 public:
-    int& op;
-    Identifier& lhs;
-    Expression& rhs;
+    int op;
+    Identifier* lhs;
+    Expression* rhs;
 
-    AssignmentExpression (Identifier& lhs, int& op, Expression& rhs) : lhs(lhs), op(op), rhs(rhs) {}
+    AssignmentExpression (Identifier*& lhs, int op, Expression*& rhs) : lhs(lhs), op(op), rhs(rhs) {}
 
     Value* codeGen () override;
-    virtual ~AssignmentExpression () {}
+
+    virtual ~AssignmentExpression () {
+        delete lhs;
+        delete rhs;
+    }
 };
 
 class UnaryExpression: public Expression {
 public:
-    int& op;
-    Expression& lhs;
+    int op;
+    Expression* lhs;
 
-    UnaryExpression (int& op, Expression& lhs) : op(op), lhs(lhs) {} 
+    UnaryExpression (int& op, Expression*& lhs) : op(op), lhs(lhs) {} 
     
     Value* codeGen () override;
-    virtual ~UnaryExpression () {}    
 };
 
 class FunctionCall: public Expression {
 public:
-    string& name;
+    string name;
     vector<Expression*> args;
 
     FunctionCall (string& name, vector<Expression*>& args) : name(name), args(args) {}
 
     Value* codeGen () override;
-    virtual ~FunctionCall () {}
 };
