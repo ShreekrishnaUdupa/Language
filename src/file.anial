@@ -1,0 +1,45 @@
+class A {};
+
+class MainShree {
+public:
+    constructor () {
+        int a = 10;
+        bool trueA = true;
+    }
+
+    Int foo () {
+        return 18;
+    }
+
+    Double bar ()
+    {
+        int x = 10, y, z = 30;
+        return 200.98;
+    }
+
+    destructor () {}
+}
+
+class Main {
+    void main () {
+        
+        Int a = 200;
+        Double a = 7 & 6;
+        
+        Int a, b, c; // This is a comment
+
+
+        /* This is Int a = 109
+
+        multiline
+
+        comment */ Double a = 10.9E8;
+    }
+}
+
+class Shrivara {
+
+    Int func (Int a, Int b) {
+        return a + b;
+    }
+}
