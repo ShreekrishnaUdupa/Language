@@ -2,6 +2,6 @@ Anial - A programming language developed by Shreekrishna Udupa (still under cons
 
 Key features: <br>
     - Static typed <br>
-    - Interpreted <br>
+    - Compiled <br>
     - Fully object oriented <br>
     - Turing complete <br>
